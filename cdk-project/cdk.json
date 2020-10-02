@@ -1,0 +1,6 @@
+{
+  "app": "node bin/cdk-project.js",
+  "requireApproval": "any-change",
+  "strict": true,
+  "versionReporting": false
+}

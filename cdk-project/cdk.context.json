@@ -1,0 +1,326 @@
+{
+  "vpc-provider:account=242817172386:filter.isDefault=true:region=us-west-2": {
+    "vpcId": "vpc-0952d571",
+    "availabilityZones": [
+      "us-west-2a",
+      "us-west-2b",
+      "us-west-2c",
+      "us-west-2d"
+    ],
+    "publicSubnetIds": [
+      "subnet-138fbd58",
+      "subnet-f41d0d8d",
+      "subnet-e207e4bf",
+      "subnet-38d44e13"
+    ],
+    "publicSubnetNames": [
+      "Public"
+    ]
+  },
+  "vpc-provider:account=142577830533:filter.isDefault=true:region=us-west-2": {
+    "vpcId": "vpc-7a5a4f1d",
+    "availabilityZones": [
+      "us-west-2a",
+      "us-west-2b",
+      "us-west-2c",
+      "us-west-2d"
+    ],
+    "publicSubnetIds": [
+      "subnet-5a611813",
+      "subnet-ddb492ba",
+      "subnet-0e04c955",
+      "subnet-926dbab9"
+    ],
+    "publicSubnetNames": [
+      "Public"
+    ]
+  },
+  "vpc-provider:account=850981987534:filter.isDefault=true:region=us-west-2": {
+    "vpcId": "vpc-4f3ecb37",
+    "availabilityZones": [
+      "us-west-2a",
+      "us-west-2b",
+      "us-west-2c",
+      "us-west-2d"
+    ],
+    "publicSubnetIds": [
+      "subnet-0e9bf645",
+      "subnet-bf4605c6",
+      "subnet-ffbde0a5",
+      "subnet-0aba5421"
+    ],
+    "publicSubnetNames": [
+      "Public"
+    ]
+  },
+  "vpc-provider:account=032676726176:filter.isDefault=true:region=us-west-2": {
+    "vpcId": "vpc-bf61d7c7",
+    "availabilityZones": [
+      "us-west-2a",
+      "us-west-2b",
+      "us-west-2c",
+      "us-west-2d"
+    ],
+    "publicSubnetIds": [
+      "subnet-531f1c2a",
+      "subnet-1a97ba51",
+      "subnet-d6e6f48c",
+      "subnet-d7c055fc"
+    ],
+    "publicSubnetNames": [
+      "Public"
+    ]
+  },
+  "vpc-provider:account=391270238698:filter.isDefault=true:region=us-west-2": {
+    "vpcId": "vpc-64a8621c",
+    "availabilityZones": [
+      "us-west-2a",
+      "us-west-2b",
+      "us-west-2c",
+      "us-west-2d"
+    ],
+    "publicSubnetIds": [
+      "subnet-aebc98d7",
+      "subnet-de6f2e95",
+      "subnet-f15a6cab",
+      "subnet-6b9f9243"
+    ],
+    "publicSubnetNames": [
+      "Public"
+    ]
+  },
+  "vpc-provider:account=040199936818:filter.isDefault=true:region=us-west-2": {
+    "vpcId": "vpc-258c3a5d",
+    "availabilityZones": [
+      "us-west-2a",
+      "us-west-2b",
+      "us-west-2c",
+      "us-west-2d"
+    ],
+    "publicSubnetIds": [
+      "subnet-b97d7ec0",
+      "subnet-acb19ce7",
+      "subnet-78c5d722",
+      "subnet-b932b892"
+    ],
+    "publicSubnetNames": [
+      "Public"
+    ]
+  },
+  "vpc-provider:account=979946343373:filter.isDefault=true:region=us-west-2": {
+    "vpcId": "vpc-7738cd0f",
+    "availabilityZones": [
+      "us-west-2a",
+      "us-west-2b",
+      "us-west-2c",
+      "us-west-2d"
+    ],
+    "publicSubnetIds": [
+      "subnet-5a400323",
+      "subnet-10ed805b",
+      "subnet-56b1ec0c",
+      "subnet-58ee0b73"
+    ],
+    "publicSubnetNames": [
+      "Public"
+    ]
+  },
+  "vpc-provider:account=168185234100:filter.isDefault=true:region=us-west-2": {
+    "vpcId": "vpc-6939cc11",
+    "availabilityZones": [
+      "us-west-2a",
+      "us-west-2b",
+      "us-west-2c",
+      "us-west-2d"
+    ],
+    "publicSubnetIds": [
+      "subnet-9b3a79e2",
+      "subnet-5493fe1f",
+      "subnet-e3b5e8b9",
+      "subnet-6995e441"
+    ],
+    "publicSubnetNames": [
+      "Public"
+    ]
+  },
+  "vpc-provider:account=026285623101:filter.isDefault=true:region=us-west-2": {
+    "vpcId": "vpc-a89e6ad0",
+    "availabilityZones": [
+      "us-west-2a",
+      "us-west-2b",
+      "us-west-2c",
+      "us-west-2d"
+    ],
+    "publicSubnetIds": [
+      "subnet-a6cb88df",
+      "subnet-8a6e02c1",
+      "subnet-513f630b",
+      "subnet-6aa09d42"
+    ],
+    "publicSubnetNames": [
+      "Public"
+    ]
+  },
+  "vpc-provider:account=385164806417:filter.isDefault=true:region=us-west-2": {
+    "vpcId": "vpc-6343f51b",
+    "availabilityZones": [
+      "us-west-2a",
+      "us-west-2b",
+      "us-west-2c",
+      "us-west-2d"
+    ],
+    "publicSubnetIds": [
+      "subnet-073a397e",
+      "subnet-ee7b57a5",
+      "subnet-ba8391e0",
+      "subnet-7be67350"
+    ],
+    "publicSubnetNames": [
+      "Public"
+    ]
+  },
+  "vpc-provider:account=474607487269:filter.isDefault=true:region=us-west-2": {
+    "vpcId": "vpc-2690655e",
+    "availabilityZones": [
+      "us-west-2a",
+      "us-west-2b",
+      "us-west-2c",
+      "us-west-2d"
+    ],
+    "publicSubnetIds": [
+      "subnet-56462b1d",
+      "subnet-16ebab6f",
+      "subnet-40471a1a",
+      "subnet-36cdb51e"
+    ],
+    "publicSubnetNames": [
+      "Public"
+    ]
+  },
+  "vpc-provider:account=117748743504:filter.isDefault=true:region=us-west-2": {
+    "vpcId": "vpc-8722d7ff",
+    "availabilityZones": [
+      "us-west-2a",
+      "us-west-2b",
+      "us-west-2c",
+      "us-west-2d"
+    ],
+    "publicSubnetIds": [
+      "subnet-73e28f38",
+      "subnet-9a480be3",
+      "subnet-67b3ee3d",
+      "subnet-d5c6f9fd"
+    ],
+    "publicSubnetNames": [
+      "Public"
+    ]
+  },
+  "vpc-provider:account=389309777320:filter.isDefault=true:region=us-west-2": {
+    "vpcId": "vpc-f89e5480",
+    "availabilityZones": [
+      "us-west-2a",
+      "us-west-2b",
+      "us-west-2c",
+      "us-west-2d"
+    ],
+    "publicSubnetIds": [
+      "subnet-42af8b3b",
+      "subnet-b26120f9",
+      "subnet-55695f0f",
+      "subnet-2aca3301"
+    ],
+    "publicSubnetNames": [
+      "Public"
+    ]
+  },
+  "vpc-provider:account=452537002400:filter.isDefault=true:region=us-west-2": {
+    "vpcId": "vpc-c23dc8ba",
+    "availabilityZones": [
+      "us-west-2a",
+      "us-west-2b",
+      "us-west-2c",
+      "us-west-2d"
+    ],
+    "publicSubnetIds": [
+      "subnet-1a387b63",
+      "subnet-30e9847b",
+      "subnet-3abbe660",
+      "subnet-d75ef9fc"
+    ],
+    "publicSubnetNames": [
+      "Public"
+    ]
+  },
+  "vpc-provider:account=883362570865:filter.isDefault=true:region=us-west-2": {
+    "vpcId": "vpc-eabf7592",
+    "availabilityZones": [
+      "us-west-2a",
+      "us-west-2b",
+      "us-west-2c",
+      "us-west-2d"
+    ],
+    "publicSubnetIds": [
+      "subnet-4083c20b",
+      "subnet-3488ac4d",
+      "subnet-7b360021",
+      "subnet-f12770d9"
+    ],
+    "publicSubnetNames": [
+      "Public"
+    ]
+  },
+  "vpc-provider:account=030232271307:filter.isDefault=true:region=us-west-2": {
+    "vpcId": "vpc-f8985280",
+    "availabilityZones": [
+      "us-west-2a",
+      "us-west-2b",
+      "us-west-2c",
+      "us-west-2d"
+    ],
+    "publicSubnetIds": [
+      "subnet-b25f1ef9",
+      "subnet-42ad893b",
+      "subnet-556b5d0f",
+      "subnet-a43f328c"
+    ],
+    "publicSubnetNames": [
+      "Public"
+    ]
+  },
+  "vpc-provider:account=900429738559:filter.isDefault=true:region=us-west-2": {
+    "vpcId": "vpc-a0ac58d8",
+    "availabilityZones": [
+      "us-west-2a",
+      "us-west-2b",
+      "us-west-2c",
+      "us-west-2d"
+    ],
+    "publicSubnetIds": [
+      "subnet-e9abe890",
+      "subnet-d3107c98",
+      "subnet-911d41cb",
+      "subnet-6c8c3947"
+    ],
+    "publicSubnetNames": [
+      "Public"
+    ]
+  },
+  "vpc-provider:account=980750204330:filter.isDefault=true:region=us-west-2": {
+    "vpcId": "vpc-0b915b73",
+    "availabilityZones": [
+      "us-west-2a",
+      "us-west-2b",
+      "us-west-2c",
+      "us-west-2d"
+    ],
+    "publicSubnetIds": [
+      "subnet-a76627ec",
+      "subnet-57b6922e",
+      "subnet-58506602",
+      "subnet-b61b1c9e"
+    ],
+    "publicSubnetNames": [
+      "Public"
+    ]
+  }
+}

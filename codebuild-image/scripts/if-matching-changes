@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# Accepts a list of filename patterns, checks to see if any matching
+# files differ from the master branch. Used by some PR builds to
+# decide which test steps are necessary. Current directory must be a
+# real git clone, so this won't work in codebuild jobs started by
+# codepipeline.
+
+set -euo pipefail
+
+# git check doesn't work in codepipeline release jobs, so we always return true
+[ "${RELEASE_BUILD:-0}" == "1" ] && exit 0
+
+# TODO limit fetch depth
+git fetch origin
+
+changes=$(git log origin/master..HEAD --oneline --no-merges --name-only --pretty=format:"%H")
+
+for i in $@; do
+    if [[ $changes = *$i* ]]
+    then
+        exit 0
+    fi
+done
+
+exit 1

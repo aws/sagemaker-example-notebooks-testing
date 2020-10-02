@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# is this a release build?
+# a trivial script, but it simplifies the syntax in buildspec.yml files
+
+[ "$RELEASE_BUILD" == "1" ]

@@ -1,0 +1,14 @@
+#!/bin/bash
+set -euo pipefail
+
+dockerd >/var/log/docker.log 2>&1 &
+
+timeout 30 sh -c 'until docker info >/dev/null 2>&1; do echo .; sleep 1; done'
+
+if [ ! $? ]; then
+    cat /var/log/docker.log
+    echo 'timed out trying to connect to internal docker host.' >&2
+    exit 1
+fi
+
+echo 'dockerd started'

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# Output the java.home value from the default jre/jdk.
+
+java -XshowSettings:properties --version 2>&1 | grep java.home | tr -s ' ' | cut -f 4 -d ' '

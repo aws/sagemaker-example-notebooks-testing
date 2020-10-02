@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# Output the arn of the iam role with the name "SageMakerRole"
+
+aws iam list-roles --output text --query "Roles[?RoleName == 'SageMakerRole'].Arn | [0]"

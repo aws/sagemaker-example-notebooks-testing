@@ -69,7 +69,7 @@ interface ProjectProps {
     owner?: string;
     repo: string;
     branch?: string;
-    enablePullRequestBuild?: boolean;
+    enablePullRequestBuilds?: boolean;
     enableReleaseBuild?: boolean;
     enableAutomaticRelease?: boolean;
     computeType?: codebuild.ComputeType;
@@ -81,7 +81,7 @@ interface ProjectProps {
     deployBuildSpec?: string;
     addSourceToReleasePipeline?: boolean;
     releasePipelineScheduleExpression?: string;
-    additionalBuildProjects?: Build[];
+    pullRequestBuilds?: Build[];
 }
 
 interface BuildProps {
@@ -113,7 +113,7 @@ export class Project {
     readonly owner: string;
     readonly repo: string;
     readonly branch: string;
-    readonly enablePullRequestBuild: boolean;
+    readonly enablePullRequestBuilds: boolean;
     readonly enableReleaseBuild: boolean;
     readonly computeType: codebuild.ComputeType;
     readonly customImage?: codebuild.IBuildImage;
@@ -124,15 +124,15 @@ export class Project {
     readonly deployBuildSpec: codebuild.BuildSpec;
     readonly addSourceToReleasePipeline: boolean;
     readonly releasePipelineScheduleExpression: string;
-    readonly additionalBuildProjects: Build[];
+    readonly pullRequestBuilds: Build[];
     readonly enableAutomaticRelease: boolean;
 
     constructor(props: ProjectProps) {
         this.repo = props.repo;
         this.owner = props.owner === undefined ? "aws" : props.owner;
         this.branch = props.branch === undefined ? "master" : props.branch;
-        this.enablePullRequestBuild =
-            props.enablePullRequestBuild === undefined ? true : props.enablePullRequestBuild;
+        this.enablePullRequestBuilds =
+            props.enablePullRequestBuilds === undefined ? true : props.enablePullRequestBuilds;
         this.enableReleaseBuild =
             props.enableReleaseBuild === undefined ? true : props.enableReleaseBuild;
         this.computeType = props.computeType || codebuild.ComputeType.SMALL;
@@ -156,8 +156,8 @@ export class Project {
             props.addSourceToReleasePipeline === undefined
                 ? false
                 : props.addSourceToReleasePipeline;
-        this.additionalBuildProjects =
-            props.additionalBuildProjects === undefined ? [] : props.additionalBuildProjects;
+        this.pullRequestBuilds =
+            props.pullRequestBuilds === undefined ? [] : props.pullRequestBuilds;
         this.enableAutomaticRelease =
             props.enableAutomaticRelease === undefined ? true : props.enableAutomaticRelease;
 

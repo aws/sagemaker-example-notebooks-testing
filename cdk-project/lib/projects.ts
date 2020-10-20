@@ -9,7 +9,7 @@ export const projects: Project[] = [
         computeType: codebuild.ComputeType.LARGE,
         timeout: Duration.minutes(150),
         enableReleaseBuild: false,
-        additionalBuildProjects: [
+        pullRequestBuilds: [
             new Build({
                 name: "sagemaker-examples-notebook-instance",
                 pullRequestBuildSpec: codebuild.BuildSpec.fromSourceFilename(
@@ -39,7 +39,7 @@ export const projects: Project[] = [
         computeType: codebuild.ComputeType.LARGE,
         timeout: Duration.minutes(150),
         enableReleaseBuild: false,
-        additionalBuildProjects: [
+        pullRequestBuilds: [
             new Build({
                 name: "sagemaker-examples-notebook-instance",
                 pullRequestBuildSpec: codebuild.BuildSpec.fromSourceFilename(

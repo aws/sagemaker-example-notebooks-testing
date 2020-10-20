@@ -1,0 +1,34 @@
+version: 0.2
+
+phases:
+  build:
+    commands:
+      - set -euo pipefail
+      - python setup.py sdist
+      - aws s3 --region us-west-2 cp ./dist/sagemaker-*.tar.gz s3://sagemaker-python-sdk-pr/sagemaker.tar.gz
+      - aws s3 cp s3://sagemaker-mead-cli/mead-nb-test.tar.gz mead-nb-test.tar.gz
+      - tar -xzf mead-nb-test.tar.gz
+      - export JAVA_HOME=$(get-java-home)
+      - echo "set JAVA_HOME=$JAVA_HOME"
+      - export SAGEMAKER_ROLE_ARN=$(aws iam list-roles --output text --query "Roles[?RoleName == 'SageMakerRole'].Arn")
+      - echo "set SAGEMAKER_ROLE_ARN=$SAGEMAKER_ROLE_ARN"
+      - |
+        ./runtime/bin/mead-run-nb-test \
+        --instance-type ml.c4.8xlarge \
+        --region us-west-2 \
+        --lifecycle-config-name install-python-sdk \
+        --notebook-instance-role-arn $SAGEMAKER_ROLE_ARN \
+        advanced_functionality/kmeans_bring_your_own_model/kmeans_bring_your_own_model.ipynb \
+        advanced_functionality/tensorflow_iris_byom/tensorflow_BYOM_iris.ipynb \
+        sagemaker-python-sdk/1P_kmeans_highlevel/kmeans_mnist.ipynb \
+        sagemaker-python-sdk/1P_kmeans_lowlevel/kmeans_mnist_lowlevel.ipynb \
+        sagemaker-python-sdk/managed_spot_training_mxnet/managed_spot_training_mxnet.ipynb \
+        sagemaker-python-sdk/mxnet_gluon_sentiment/mxnet_sentiment_analysis_with_gluon.ipynb \
+        sagemaker-python-sdk/mxnet_onnx_eia/mxnet_onnx_eia.ipynb \
+        sagemaker-python-sdk/mxnet_onnx_export/mxnet_onnx_export.ipynb \
+        sagemaker-python-sdk/pytorch_cnn_cifar10/pytorch_local_mode_cifar10.ipynb \
+        sagemaker-python-sdk/scikit_learn_randomforest/Sklearn_on_SageMaker_end2end.ipynb \
+        sagemaker-python-sdk/tensorflow_moving_from_framework_mode_to_script_mode/tensorflow_moving_from_framework_mode_to_script_mode.ipynb \
+        sagemaker-python-sdk/tensorflow_script_mode_pipe_mode/tensorflow_script_mode_pipe_mode.ipynb \
+        sagemaker-python-sdk/tensorflow_script_mode_quickstart/tensorflow_script_mode_quickstart.ipynb \
+        sagemaker-python-sdk/tensorflow_script_mode_using_shell_commands/tensorflow_script_mode_using_shell_commands.ipynb \

@@ -234,8 +234,8 @@ export class BuildSystemStack extends cdk.Stack {
     }
 
     createPullRequestBuildEcrRepo(): ecr.Repository {
-        const repo = new ecr.Repository(this, "sagemaker-test", {
-            repositoryName: "sagemaker-test",
+        const repo = new ecr.Repository(this, "test-image", {
+            repositoryName: "test-image",
         });
 
         const policy = new iam.PolicyStatement();

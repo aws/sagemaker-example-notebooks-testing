@@ -29,6 +29,6 @@ function createBuildStacks(
 
 const app = new cdk.App();
 createBuildStacks(app, "Sandbox", common.Environments.sandbox());
-createBuildStacks(app, "Dev", common.Environments.dev());
+createBuildStacks(app, "Prod", common.Environments.prod());
 
 app.synth();

@@ -22,7 +22,7 @@ export class Constants {
 
     static readonly gitHubOAuthSecretId = "/codebuild/github/oauth";
 
-    static readonly devRegion = "us-west-2";
+    static readonly region = "us-west-2";
 }
 
 export class Environments {
@@ -38,7 +38,7 @@ export class Environments {
     static sandbox(): cdk.Environment {
         const env = Environments.current();
 
-        if (env.account && Environments.isDevAccount(env.account)) {
+        if (env.account && Environments.isProdAccount(env.account)) {
             process.stderr.write(
                 "\nWARNING: Do not deploy Sandbox stacks to the example notebooks account!\n\n",
             );
@@ -47,17 +47,17 @@ export class Environments {
         return env;
     }
 
-    static dev(): cdk.Environment {
-        return { account: Environments.exampleNotebooksAccountId, region: Constants.devRegion };
+    static prod(): cdk.Environment {
+        return { account: Environments.exampleNotebooksAccountId, region: Constants.region };
     }
 
-    static isDevAccount(accountId: string): boolean {
+    static isProdAccount(accountId: string): boolean {
         return Environments.exampleNotebooksAccountId === accountId;
     }
 
     static prefix(accountId: string): string {
-        if (Environments.isDevAccount(accountId)) {
-            return "Dev";
+        if (Environments.isProdAccount(accountId)) {
+            return "Prod";
         }
 
         return "Sandbox";

@@ -78,7 +78,7 @@ export class ProjectStack extends cdk.Stack {
             "ArtifactBucket",
             props.artifactBucket.bucketArn,
         );
-        this.buildImage = common.importBuildImage(this, Environments.dev());
+        this.buildImage = common.importBuildImage(this, Environments.prod());
         this.gitHubToken = common.gitHubOAuthSecret();
         this.addProject(props.project);
     }

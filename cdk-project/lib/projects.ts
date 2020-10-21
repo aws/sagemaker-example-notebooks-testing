@@ -11,9 +11,9 @@ export const projects: Project[] = [
         enableReleaseBuild: false,
         pullRequestBuilds: [
             new Build({
-                name: "sagemaker-examples-studio",
+                name: "sagemaker-examples-notebook-instance",
                 pullRequestBuildSpec: codebuild.BuildSpec.fromSourceFilename(
-                    "buildspec-studio.yml",
+                    "buildspec-notebook-instance.yml",
                 ),
                 computeType: codebuild.ComputeType.X2_LARGE,
             }),
@@ -34,9 +34,9 @@ export const projects: Project[] = [
         enableReleaseBuild: false,
         pullRequestBuilds: [
             new Build({
-                name: "sagemaker-examples-studio",
+                name: "sagemaker-examples-notebook-instance",
                 pullRequestBuildSpec: codebuild.BuildSpec.fromSourceFilename(
-                    "buildspec-studio.yml",
+                    "buildspec-notebook-instance.yml",
                 ),
                 computeType: codebuild.ComputeType.X2_LARGE,
             }),

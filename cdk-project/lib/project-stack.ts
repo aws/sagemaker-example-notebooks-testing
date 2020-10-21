@@ -139,8 +139,8 @@ export class ProjectStack extends cdk.Stack {
     }
 
     addProject(p: common.Project): void {
-        if (p.enablePullRequestBuilds) {
-            this.addPullRequestBuilds(p);
+        if (p.enablePullRequestBuild) {
+            this.addPullRequestBuild(p);
         }
 
         if (p.enableReleaseBuild) {
@@ -149,8 +149,27 @@ export class ProjectStack extends cdk.Stack {
         }
     }
 
-    addPullRequestBuilds(p: common.Project): void {
+    addPullRequestBuild(p: common.Project): void {
         const defaultProjectBuildImage = this.buildImage;
+
+        const source = codebuild.Source.gitHub({
+            owner: p.owner || common.Constants.defaultGitHubOwner,
+            repo: p.repo,
+            reportBuildStatus: true,
+            webhook: false,
+        });
+        const project = new codebuild.Project(this, "PrProject", {
+            projectName: `${p.name}-pr`,
+            role: this.pullRequestBuildRole,
+            environment: {
+                buildImage: p.customImage || defaultProjectBuildImage,
+                privileged: true,
+                computeType: p.computeType,
+            },
+            timeout: p.timeout,
+            buildSpec: p.pullRequestBuildSpec,
+            source: source,
+        });
 
         const buildSource = codebuild.Source.gitHub({
             owner: p.owner || common.Constants.defaultGitHubOwner,
@@ -159,12 +178,14 @@ export class ProjectStack extends cdk.Stack {
             webhook: true,
         });
 
-        for (const build of p.pullRequestBuilds) {
+        for (const build of p.additionalBuildProjects) {
+            const defaultAdditionalBuildImage = this.buildImage;
+
             const buildProject = new codebuild.Project(this, build.name, {
                 projectName: build.name,
                 role: this.pullRequestBuildRole,
                 environment: {
-                    buildImage: build.customImage || defaultProjectBuildImage,
+                    buildImage: build.customImage || defaultAdditionalBuildImage,
                     privileged: true,
                     computeType: build.computeType,
                 },
@@ -173,10 +194,12 @@ export class ProjectStack extends cdk.Stack {
                 source: buildSource,
             });
 
-            common.enableCrossAccountImagePull(buildProject);
-            common.enableSageMakerOperation(buildProject);
             this.addGitHubCodeBuildLogsSAR(buildProject, `${build.name}-build-logs-sar`);
         }
+
+        common.enableCrossAccountImagePull(project);
+        common.enableSageMakerOperation(project);
+        this.addGitHubCodeBuildLogsSAR(project);
     }
 
     addGitHubCodeBuildLogsSAR(project: codebuild.Project, name?: string): void {

@@ -11,19 +11,12 @@ export const projects: Project[] = [
         enableReleaseBuild: false,
         additionalBuildProjects: [
             new Build({
-                name: "sagemaker-examples-notebook-instance",
+                name: "sagemaker-examples-best-practices",
                 pullRequestBuildSpec: codebuild.BuildSpec.fromSourceFilename(
-                    "buildspec-notebook-instance.yml",
+                    "buildspec-best-practices.yml",
                 ),
-                computeType: codebuild.ComputeType.X2_LARGE,
+                computeType: codebuild.ComputeType.LARGE,
             }),
-            // new Build({
-            //     name: "sagemaker-examples-best-practices",
-            //     pullRequestBuildSpec: codebuild.BuildSpec.fromSourceFilename(
-            //         "buildspec-best-practices.yml",
-            //     ),
-            //     computeType: codebuild.ComputeType.LARGE,
-            // }),
         ],
     }),
 
@@ -34,19 +27,12 @@ export const projects: Project[] = [
         enableReleaseBuild: false,
         additionalBuildProjects: [
             new Build({
-                name: "sagemaker-examples-notebook-instance",
+                name: "sagemaker-examples-best-practices",
                 pullRequestBuildSpec: codebuild.BuildSpec.fromSourceFilename(
-                    "buildspec-notebook-instance.yml",
+                    "buildspec-best-practices.yml",
                 ),
-                computeType: codebuild.ComputeType.X2_LARGE,
+                computeType: codebuild.ComputeType.LARGE,
             }),
-            // new Build({
-            //     name: "sagemaker-examples-best-practices",
-            //     pullRequestBuildSpec: codebuild.BuildSpec.fromSourceFilename(
-            //         "buildspec-best-practices.yml",
-            //     ),
-            //     computeType: codebuild.ComputeType.LARGE,
-            // }),
         ],
     }),
 ];

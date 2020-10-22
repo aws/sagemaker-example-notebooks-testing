@@ -118,5 +118,5 @@ def handler(event, context):  # pylint: disable=unused-argument
         return {"statusCode": 200}
 
     except Exception as e:  # pylint: disable=broad-except
-        logger.exception()
+        logger.exception(str(e))
         return {"statusCode": 500, "body": str(e)}

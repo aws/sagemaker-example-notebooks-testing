@@ -74,6 +74,10 @@ RUN rm -rf /var/lib/apt/lists/* \
 # copy files
 COPY etc/ssh_config /root/.ssh/config
 COPY scripts/* /usr/local/bin/
+COPY python/dist/sagemakerci*.tar.gz /tmp
+
+# install sagemakerci
+RUN pip3 install /tmp/sagemakerci*.tar.gz && rm /tmp/sagemakerci*.tar.gz
 
 # set environment variables
 ENV IS_CODEBUILD_IMAGE=true

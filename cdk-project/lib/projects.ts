@@ -17,13 +17,13 @@ export const projects: Project[] = [
                 ),
                 computeType: codebuild.ComputeType.X2_LARGE,
             }),
-            new Build({
-                name: "sagemaker-examples-best-practices",
-                pullRequestBuildSpec: codebuild.BuildSpec.fromSourceFilename(
-                    "buildspec-best-practices.yml",
-                ),
-                computeType: codebuild.ComputeType.LARGE,
-            }),
+            // new Build({
+            //     name: "sagemaker-examples-best-practices",
+            //     pullRequestBuildSpec: codebuild.BuildSpec.fromSourceFilename(
+            //         "buildspec-best-practices.yml",
+            //     ),
+            //     computeType: codebuild.ComputeType.LARGE,
+            // }),
         ],
     }),
 
@@ -40,13 +40,13 @@ export const projects: Project[] = [
                 ),
                 computeType: codebuild.ComputeType.X2_LARGE,
             }),
-            new Build({
-                name: "sagemaker-examples-best-practices",
-                pullRequestBuildSpec: codebuild.BuildSpec.fromSourceFilename(
-                    "buildspec-best-practices.yml",
-                ),
-                computeType: codebuild.ComputeType.LARGE,
-            }),
+            // new Build({
+            //     name: "sagemaker-examples-best-practices",
+            //     pullRequestBuildSpec: codebuild.BuildSpec.fromSourceFilename(
+            //         "buildspec-best-practices.yml",
+            //     ),
+            //     computeType: codebuild.ComputeType.LARGE,
+            // }),
         ],
     }),
 ];

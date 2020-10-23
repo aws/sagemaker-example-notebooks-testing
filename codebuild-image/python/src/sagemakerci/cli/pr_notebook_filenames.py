@@ -20,7 +20,8 @@ def parse_args(args):
 
 def is_notebook(filename):
     root, ext = os.path.splitext(filename)
-    return ext == ".ipynb"
+    if ext == ".ipynb":
+        return os.path.exists(filename)
 
 def main():
     args = parse_args(sys.argv[1:])

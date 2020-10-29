@@ -14,6 +14,8 @@ def parse_args(args):
     parser = argparse.ArgumentParser(os.path.basename(__file__))
     parser.set_defaults(func=lambda x: parser.print_usage())
     parser.add_argument("--pr", help="Pull request number", type=int, required=True)
+    parser.add_argument("--image", help="Pull request number", type=str, required=False)
+    parser.add_argument("--instance", help="Pull request number", type=str, required=False)
 
     parsed = parser.parse_args(args)
     if not parsed.pr:
@@ -41,11 +43,13 @@ def main():
 
     results = {}
 
+    image = args.image or "521695447989.dkr.ecr.us-west-2.amazonaws.com/dlami-image:35.0"
+    instance_type = args.instance or "ml.m5.xlarge"
     for notebook in notebook_filenames(args.pr):
         results[notebook] = sagemaker_run_notebook.run(
-            image="521695447989.dkr.ecr.us-west-2.amazonaws.com/dlami-image:35.0",
+            image=image,
             notebook=notebook,
-            instance_type="ml.m5.xlarge",
+            instance_type=instance_type,
         )
 
     failures = {}

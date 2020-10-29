@@ -79,5 +79,9 @@ COPY python/dist/sagemakerci*.tar.gz /tmp
 # install sagemakerci
 RUN pip3 install /tmp/sagemakerci*.tar.gz && rm /tmp/sagemakerci*.tar.gz
 
+# install sagemaker-run-notebook
+ENV SAGEMAKER_RUN_NOTEBOOK_VERSION=0.16.0
+RUN pip3 install https://github.com/aws-samples/sagemaker-run-notebook/releases/download/v${SAGEMAKER_RUN_NOTEBOOK_VERSION}/sagemaker_run_notebook-${SAGEMAKER_RUN_NOTEBOOK_VERSION}.tar.gz
+
 # set environment variables
 ENV IS_CODEBUILD_IMAGE=true

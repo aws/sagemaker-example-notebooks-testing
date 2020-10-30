@@ -46,9 +46,10 @@ def main():
     image = args.image or "521695447989.dkr.ecr.us-west-2.amazonaws.com/dlami-image:35.0"
     instance_type = args.instance or "ml.m5.xlarge"
     for notebook in notebook_filenames(args.pr):
-        results[notebook] = sagemaker_run_notebook.run(
+        results[notebook] = sagemaker_run_notebook.run_notebook(
             image=image,
             notebook=notebook,
+            role="SageMakerRole",
             instance_type=instance_type,
         )
 
@@ -56,20 +57,23 @@ def main():
 
     for notebook, result in results.items():
         job_name, status, local, failure_reason = result
-        print()
+        print("\n" * 2)
         print(f"********* {notebook} *********")
         print("*")
         print(f"* {'job name':>18}: {job_name:<18}")
         print("*")
         print(f"* {'status':>18}: {status:<18}")
+        print("*")
         if status != "Completed":
-            print("*")
-            print(f"* {'failure reason':>18}: {failure_reason:<18}")
-            print("*")
+            print()
+            print(failure_reason)
             failures[notebook] = failure_reason
 
+    print("-" * 70)
     if len(failures) > 0:
-        raise Exception(json.dumps(failures))
+        raise Exception(
+            "One or more notebooks failed to execute. Please see above for error messages."
+        )
 
 
 if __name__ == "__main__":

@@ -67,8 +67,11 @@ def main():
         if status != "Completed":
             print()
             print(failure_reason)
+            print()
             failures[notebook] = failure_reason
+        print("*" * (20 + len(notebook)))
 
+    print("\n" * 2)
     print("-" * 70)
     if len(failures) > 0:
         raise Exception(

@@ -38,18 +38,12 @@ RUN apt-get update \
 ENV PYENV_ROOT /.pyenv
 ENV PATH /.pyenv/bin:/.pyenv/shims:$PATH
 RUN curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash \
-    && pyenv install 3.6.10 \
-    && pyenv install 3.7.7 \
     && pyenv install 3.8.3 \
     && pyenv global $(pyenv versions --bare) \
     && pyenv rehash
 
 # install Python packages -- ubuntu:18.04 system Python is 3.6, ubuntu:20.04 is 3.8
 RUN pip3 install -U pip boto3 awscli requests tox twine fabric
-# for integ tests -- buildspec.yml refers directly to python3.7 in non-venv
-RUN pip3.7 install -U pip boto3 awscli requests tox twine fabric
-# we also install libraries for 3.8 for duration of upgrade
-RUN pip3.8 install -U pip boto3 awscli requests tox twine fabric
 
 # install Node.js and npm
 RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - \

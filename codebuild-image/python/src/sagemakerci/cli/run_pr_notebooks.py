@@ -31,7 +31,7 @@ def is_notebook(filename):
 
 
 def notebook_filenames(pr_num):
-    # token = sagemakerci.git.Git().oauth.token
+    # token = sagemakerci.git.Git().oauth_token
     g = Github()  # token)
     repo = g.get_repo("aws/amazon-sagemaker-examples")
     pr = repo.get_pull(pr_num)

@@ -38,7 +38,6 @@ RUN apt-get update \
 ENV PYENV_ROOT /.pyenv
 ENV PATH /.pyenv/bin:/.pyenv/shims:$PATH
 RUN curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash \
-    && pyenv install 2.7.17 \
     && pyenv install 3.6.10 \
     && pyenv install 3.7.7 \
     && pyenv install 3.8.3 \
@@ -80,7 +79,7 @@ COPY python/dist/sagemakerci*.tar.gz /tmp
 RUN pip3 install /tmp/sagemakerci*.tar.gz && rm /tmp/sagemakerci*.tar.gz
 
 # install sagemaker-run-notebook
-ENV SAGEMAKER_RUN_NOTEBOOK_VERSION=0.16.0
+ENV SAGEMAKER_RUN_NOTEBOOK_VERSION=0.18.0
 RUN pip3 install https://github.com/aws-samples/sagemaker-run-notebook/releases/download/v${SAGEMAKER_RUN_NOTEBOOK_VERSION}/sagemaker_run_notebook-${SAGEMAKER_RUN_NOTEBOOK_VERSION}.tar.gz
 
 # set environment variables

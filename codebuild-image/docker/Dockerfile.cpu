@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM public.ecr.aws/lts/ubuntu:20.04
 
 # disable prompts during package installation
 ARG DEBIAN_FRONTEND=noninteractive

@@ -65,9 +65,7 @@ def main():
         print(f"* {'status':>18}: {status:<18}")
         print("*")
         if status != "Completed":
-            print()
             print(failure_reason)
-            print()
             failures[notebook] = failure_reason
         print("*" * (20 + len(notebook)))
 

@@ -73,7 +73,8 @@ def main():
     print("-" * 70)
     if len(failures) > 0:
         raise Exception(
-            "One or more notebooks failed to execute. Please see above for error messages."
+            "One or more notebooks failed to execute. Please see above for error messages. "
+            "If you need more information, please see the CloudWatch logs for the corresponding Processing job."
         )
 
 

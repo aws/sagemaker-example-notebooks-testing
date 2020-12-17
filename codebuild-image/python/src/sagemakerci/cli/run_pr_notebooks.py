@@ -43,7 +43,7 @@ def main():
 
     results = {}
 
-    image = args.image or "521695447989.dkr.ecr.us-west-2.amazonaws.com/dlami-image:35.0"
+    image = args.image or "521695447989.dkr.ecr.us-west-2.amazonaws.com/papermill-processing:latest"
     instance_type = args.instance or "ml.m5.xlarge"
     for notebook in notebook_filenames(args.pr):
         results[notebook] = sagemaker_run_notebook.run_notebook(

@@ -67,7 +67,6 @@ def main():
         if status != "Completed":
             print(failure_reason)
             failures[notebook] = failure_reason
-        print("*" * (20 + len(notebook)))
 
     print("\n" * 2)
     print("-" * 70)

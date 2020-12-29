@@ -7,7 +7,7 @@ export const projects: Project[] = [
     new Project({
         repo: Constants.exampleNotebooksRepo,
         computeType: codebuild.ComputeType.LARGE,
-        timeout: Duration.minutes(150),
+        timeout: Duration.minutes(480),
         enableReleaseBuild: false,
         additionalBuildProjects: [
             // new Build({
@@ -23,7 +23,7 @@ export const projects: Project[] = [
     new Project({
         repo: "amazon-sagemaker-examples-staging",
         computeType: codebuild.ComputeType.LARGE,
-        timeout: Duration.minutes(150),
+        timeout: Duration.minutes(480),
         enableReleaseBuild: false,
         additionalBuildProjects: [
             //     new Build({

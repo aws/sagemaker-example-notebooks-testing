@@ -1,6 +1,6 @@
 import codebuild = require("@aws-cdk/aws-codebuild");
 
-import { Constants, Project, Build } from "./common";
+import { Constants, Project } from "./common";
 import { Duration } from "@aws-cdk/core";
 
 export const projects: Project[] = [
@@ -10,13 +10,13 @@ export const projects: Project[] = [
         timeout: Duration.minutes(480),
         enableReleaseBuild: false,
         additionalBuildProjects: [
-            new Build({
-                name: "sagemaker-examples-notebook-instance",
-                pullRequestBuildSpec: codebuild.BuildSpec.fromSourceFilename(
-                    "buildspec-notebook-instance.yml",
-                ),
-                computeType: codebuild.ComputeType.LARGE,
-            }),
+            // new Build({
+            //     name: "sagemaker-examples-notebook-instance",
+            //     pullRequestBuildSpec: codebuild.BuildSpec.fromSourceFilename(
+            //         "buildspec-notebook-instance.yml",
+            //     ),
+            //     computeType: codebuild.ComputeType.LARGE,
+            // }),
             // new Build({
             //     name: "sagemaker-examples-best-practices",
             //     pullRequestBuildSpec: codebuild.BuildSpec.fromSourceFilename(
@@ -33,13 +33,13 @@ export const projects: Project[] = [
         timeout: Duration.minutes(480),
         enableReleaseBuild: false,
         additionalBuildProjects: [
-            new Build({
-                name: "sagemaker-examples-notebook-instance",
-                pullRequestBuildSpec: codebuild.BuildSpec.fromSourceFilename(
-                    "buildspec-notebook-instance.yml",
-                ),
-                computeType: codebuild.ComputeType.LARGE,
-            }),
+            // new Build({
+            //     name: "sagemaker-examples-notebook-instance",
+            //     pullRequestBuildSpec: codebuild.BuildSpec.fromSourceFilename(
+            //         "buildspec-notebook-instance.yml",
+            //     ),
+            //     computeType: codebuild.ComputeType.LARGE,
+            // }),
             //     new Build({
             //         name: "sagemaker-examples-best-practices",
             //         pullRequestBuildSpec: codebuild.BuildSpec.fromSourceFilename(

@@ -11,6 +11,8 @@ import { ManagedPolicy } from "@aws-cdk/aws-iam";
 import { Duration, Stack } from "@aws-cdk/core";
 import { Schedule } from "@aws-cdk/aws-events";
 
+import buildspecs = require("./buildspecs");
+
 export class Constants {
     static readonly buildImage = {
         repo: "sagemaker-codebuild",
@@ -76,9 +78,9 @@ interface ProjectProps {
     customImage?: codebuild.IBuildImage;
     timeout?: Duration;
     deploymentTimeout?: Duration;
-    pullRequestBuildSpec?: string;
-    releaseBuildSpec?: string;
-    deployBuildSpec?: string;
+    pullRequestBuildSpec?: codebuild.BuildSpec;
+    releaseBuildSpec?: codebuild.BuildSpec;
+    deployBuildSpec?: codebuild.BuildSpec;
     addSourceToReleasePipeline?: boolean;
     releasePipelineScheduleExpression?: string;
     additionalBuildProjects?: Build[];
@@ -142,16 +144,16 @@ export class Project {
             props.deploymentTimeout === undefined ? Duration.hours(8) : props.deploymentTimeout;
         this.pullRequestBuildSpec =
             props.pullRequestBuildSpec === undefined
-                ? codebuild.BuildSpec.fromSourceFilename("buildspec.yml")
-                : codebuild.BuildSpec.fromSourceFilename(props.pullRequestBuildSpec);
+                ? buildspecs.createPullRequestBuildSpec()
+                : props.pullRequestBuildSpec;
         this.releaseBuildSpec =
             props.releaseBuildSpec === undefined
-                ? codebuild.BuildSpec.fromSourceFilename("buildspec-release.yml")
-                : codebuild.BuildSpec.fromSourceFilename(props.releaseBuildSpec);
+                ? buildspecs.createPrimaryReleaseBuildSpec()
+                : props.releaseBuildSpec;
         this.deployBuildSpec =
             props.deployBuildSpec === undefined
-                ? codebuild.BuildSpec.fromSourceFilename("buildspec-deploy.yml")
-                : codebuild.BuildSpec.fromSourceFilename(props.deployBuildSpec);
+                ? buildspecs.createDeployBuildSpec()
+                : props.deployBuildSpec;
         this.addSourceToReleasePipeline =
             props.addSourceToReleasePipeline === undefined
                 ? false

@@ -12,16 +12,12 @@ export const projects: Project[] = [
         additionalBuildProjects: [
             // new Build({
             //     name: "sagemaker-examples-notebook-instance",
-            //     pullRequestBuildSpec: codebuild.BuildSpec.fromSourceFilename(
-            //         "buildspec-notebook-instance.yml",
-            //     ),
+            //     pullRequestBuildSpec: buildspecs.createNotebookInstanceBuildSpec(),
             //     computeType: codebuild.ComputeType.LARGE,
             // }),
             // new Build({
             //     name: "sagemaker-examples-best-practices",
-            //     pullRequestBuildSpec: codebuild.BuildSpec.fromSourceFilename(
-            //         "buildspec-best-practices.yml",
-            //     ),
+            //     pullRequestBuildSpec: buildspecs.createBestPracticesBuildSpec(),
             //     computeType: codebuild.ComputeType.LARGE,
             // }),
         ],
@@ -35,18 +31,14 @@ export const projects: Project[] = [
         additionalBuildProjects: [
             // new Build({
             //     name: "sagemaker-examples-notebook-instance",
-            //     pullRequestBuildSpec: codebuild.BuildSpec.fromSourceFilename(
-            //         "buildspec-notebook-instance.yml",
-            //     ),
+            //     pullRequestBuildSpec: buildspecs.createNotebookInstanceBuildSpec(),
             //     computeType: codebuild.ComputeType.LARGE,
             // }),
-            //     new Build({
-            //         name: "sagemaker-examples-best-practices",
-            //         pullRequestBuildSpec: codebuild.BuildSpec.fromSourceFilename(
-            //             "buildspec-best-practices.yml",
-            //         ),
-            //         computeType: codebuild.ComputeType.LARGE,
-            //     }),
+            // new Build({
+            //     name: "sagemaker-examples-best-practices",
+            //     pullRequestBuildSpec: buildspecs.createBestPracticesBuildSpec(),
+            //     computeType: codebuild.ComputeType.LARGE,
+            // }),
         ],
     }),
 ];

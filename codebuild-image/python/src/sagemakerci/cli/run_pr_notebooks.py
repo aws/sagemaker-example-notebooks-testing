@@ -4,8 +4,7 @@ import json
 import os
 import sys
 
-# import sagemakerci.git
-import sagemaker_run_notebook
+from sagemakerci.run_notebook import run_notebook
 
 from github import Github
 
@@ -46,7 +45,7 @@ def main():
     image = args.image or "521695447989.dkr.ecr.us-west-2.amazonaws.com/papermill-processing:latest"
     instance_type = args.instance or "ml.m5.xlarge"
     for notebook in notebook_filenames(args.pr):
-        results[notebook] = sagemaker_run_notebook.run_notebook(
+        results[notebook] = run_notebook(
             image=image,
             notebook=notebook,
             role="SageMakerRole",

@@ -58,7 +58,7 @@ def main():
         job_name, status, local, failure_reason = result
         print("\n" * 2)
         basename = os.path.basename(notebook)
-        print(f"* {basename} " + "*"*(77 - len(basename)))
+        print(f"* {basename} " + "*" * (77 - len(basename)))
         print("*")
         print(f"* {'job name':>11}: {job_name:<11}")
         print("*")

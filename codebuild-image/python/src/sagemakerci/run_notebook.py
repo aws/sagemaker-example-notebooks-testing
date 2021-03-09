@@ -89,6 +89,7 @@ def upload_notebook(notebook, session=None):
 
     return f"s3://{bucket}/{prefix}/"
 
+
 def upload_fileobj(notebook_fileobj, session=None):
     """Uploads a file object to S3 in the default SageMaker Python SDK bucket for
     this user. The resulting S3 object will be named "s3://<bucket>/papermill-input/notebook-YYYY-MM-DD-hh-mm-ss.ipynb".

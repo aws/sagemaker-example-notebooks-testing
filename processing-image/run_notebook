@@ -1,0 +1,4 @@
+#!/bin/bash
+
+#python3 -u /opt/program/execute.py 2>&1 | stdbuf -o0 tr '\r' '\n'
+python3 /opt/program/execute.py

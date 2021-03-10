@@ -4,6 +4,7 @@ import common = require("../lib/common");
 import { BuildSystemStack } from "../lib/build-system-stack";
 import { ProjectStack } from "../lib/project-stack";
 import { projects } from "../lib/projects";
+import { ImageStack } from "../lib/image-stack";
 
 function createBuildStacks(
     app: cdk.App,
@@ -27,8 +28,13 @@ function createBuildStacks(
     }
 }
 
+function createImageStack(app: cdk.App, prefix: string, env?: cdk.Environment): ImageStack {
+    return new ImageStack(app, prefix, { env: env, terminationProtection: true });
+}
+
 const app = new cdk.App();
 createBuildStacks(app, "Sandbox", common.Environments.sandbox());
 createBuildStacks(app, "Prod", common.Environments.prod());
+createImageStack(app, "Prod", common.Environments.prod());
 
 app.synth();

@@ -1,6 +1,7 @@
 import cdk = require("@aws-cdk/core");
 
 import path = require("path");
+const changeCase = require("change-case");
 import common = require("./common");
 
 import { DockerImageAsset } from "@aws-cdk/aws-ecr-assets";
@@ -64,7 +65,8 @@ export class ImageStack extends cdk.Stack {
     }
 
     createProcessingImage(name: string, baseImageUri: string): DockerImageAsset {
-        return new DockerImageAsset(this, "CodeBuildImage", {
+        const pascal = changeCase.pascal(name);
+        return new DockerImageAsset(this, `${pascal}ProcessingImage`, {
             repositoryName: name,
             directory: path.join(__dirname, "images", "processing-image"),
             buildArgs: {

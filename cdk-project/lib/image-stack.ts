@@ -35,17 +35,17 @@ export class ImageStack extends cdk.Stack {
 
         this.codeBuildImage = this.createCodeBuildImage("sagemaker-codebuild");
 
-        this.basePythonImage = this.createProcessingImageFrom1P(
-            "base-python",
-            "sagemaker-base-python-environment",
-            "1.0",
-        );
-        this.dataScienceImage = this.createProcessingImageFrom1P(
-            "data-science",
-            "sagemaker-data-science-environment",
-            "1.0",
-        );
-
+        // this.basePythonImage = this.createProcessingImageFrom1P(
+        //     "base-python",
+        //     "sagemaker-base-python-environment",
+        //     "1.0",
+        // );
+        // this.dataScienceImage = this.createProcessingImageFrom1P(
+        //     "data-science",
+        //     "sagemaker-data-science-environment",
+        //     "1.0",
+        // );
+        //
         this.mxnetImage = this.createProcessingImageFromDlc(
             "mxnet",
             "mxnet-training",

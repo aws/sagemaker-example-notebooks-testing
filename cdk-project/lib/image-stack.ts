@@ -1,4 +1,5 @@
 import cdk = require("@aws-cdk/core");
+import iam = require("@aws-cdk/aws-iam");
 
 import path = require("path");
 const changeCase = require("change-case");
@@ -6,9 +7,13 @@ import common = require("./common");
 
 import { DockerImageAsset } from "@aws-cdk/aws-ecr-assets";
 
-type ImageStackProps = cdk.StackProps;
+interface ImageStackProps extends cdk.StackProps {
+    pullRequestBuildRole: iam.Role;
+}
 
 export class ImageStack extends cdk.Stack {
+    private readonly pullRequestBuildRole: iam.IRole;
+
     readonly codeBuildImage: DockerImageAsset;
 
     readonly basePythonImage: DockerImageAsset;
@@ -21,6 +26,12 @@ export class ImageStack extends cdk.Stack {
 
     constructor(scope: cdk.App, prefix: string, props: ImageStackProps) {
         super(scope, common.stackId(prefix, "ImageStack", props), props);
+
+        this.pullRequestBuildRole = iam.Role.fromRoleArn(
+            this,
+            "PullRequestBuildRole",
+            props.pullRequestBuildRole.roleArn,
+        );
 
         this.codeBuildImage = this.createCodeBuildImage("sagemaker-codebuild");
 
@@ -58,21 +69,25 @@ export class ImageStack extends cdk.Stack {
     }
 
     createCodeBuildImage(name: string): DockerImageAsset {
-        return new DockerImageAsset(this, "CodeBuildImage", {
+        const asset = new DockerImageAsset(this, "CodeBuildImage", {
             repositoryName: name,
             directory: path.join(__dirname, "images", "codebuild-image"),
         });
+        asset.repository.grantPull(this.pullRequestBuildRole);
+        return asset;
     }
 
     createProcessingImage(name: string, baseImageUri: string): DockerImageAsset {
         const pascal = changeCase.pascal(name);
-        return new DockerImageAsset(this, `${pascal}ProcessingImage`, {
+        const asset = new DockerImageAsset(this, `${pascal}ProcessingImage`, {
             repositoryName: name,
             directory: path.join(__dirname, "images", "processing-image"),
             buildArgs: {
                 BASE_IMAGE: baseImageUri,
             },
         });
+        asset.repository.grantPull(this.pullRequestBuildRole);
+        return asset;
     }
 
     createProcessingImageFrom1P(

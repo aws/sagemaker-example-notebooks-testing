@@ -26,15 +26,16 @@ function createBuildStacks(
             new ProjectStack(app, prefix, props);
         }
     }
-}
 
-function createImageStack(app: cdk.App, prefix: string, env?: cdk.Environment): ImageStack {
-    return new ImageStack(app, prefix, { env: env, terminationProtection: true });
+    new ImageStack(app, prefix, {
+        env: env,
+        terminationProtection: true,
+        pullRequestBuildRole: buildSystemStack.pullRequestBuildRole,
+    });
 }
 
 const app = new cdk.App();
 createBuildStacks(app, "Sandbox", common.Environments.sandbox());
 createBuildStacks(app, "Prod", common.Environments.prod());
-createImageStack(app, "Prod", common.Environments.prod());
 
 app.synth();

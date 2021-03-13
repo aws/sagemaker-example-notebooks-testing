@@ -34,8 +34,7 @@ def parse_args(args):
     parser = argparse.ArgumentParser(os.path.basename(__file__))
     parser.set_defaults(func=lambda x: parser.print_usage())
     parser.add_argument("--pr", help="Pull request number", type=int, required=True)
-    parser.add_argument("--image", help="Pull request number", type=str, required=False)
-    parser.add_argument("--instance", help="Pull request number", type=str, required=False)
+    parser.add_argument("--instance", help="Instance type", type=str, required=False)
 
     parsed = parser.parse_args(args)
     if not parsed.pr:
@@ -60,7 +59,6 @@ def notebook_filenames(pr_num):
 
 def kernel_image_for(notebook):
     """Read the notebook and extract the kernel name, if any"""
-    kernel_name = None
     with open(notebook, "r") as f:
         nb = json.load(f)
 
@@ -71,6 +69,7 @@ def kernel_image_for(notebook):
                 kernel_name = ks["display_name"]
 
     if kernel_name:
+        print(kernel_name)
         if kernel_name in NOTEBOOK_INSTANCE_KERNELS:
             return NOTEBOOK_INSTANCE_KERNELS[kernel_name]
         elif "Base Python" in kernel_name:
@@ -85,8 +84,7 @@ def kernel_image_for(notebook):
             return TENSORFLOW_1_IMAGE
         elif "TensorFlow 2" in kernel_name:
             return TENSORFLOW_2_IMAGE
-    else:
-        return DATA_SCIENCE_IMAGE
+    return DATA_SCIENCE_IMAGE
 
 
 def main():
@@ -96,7 +94,8 @@ def main():
 
     instance_type = args.instance or "ml.m5.xlarge"
     for notebook in notebook_filenames(args.pr):
-        image = args.image or kernel_image_for(notebook)
+        image = kernel_image_for(notebook)
+        print(image)
         results[notebook] = run_notebook(
             image=image,
             notebook=notebook,

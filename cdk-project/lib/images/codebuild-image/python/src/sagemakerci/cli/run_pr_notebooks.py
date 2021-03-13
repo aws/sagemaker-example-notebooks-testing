@@ -57,7 +57,7 @@ def notebook_filenames(pr_num):
     return filter(is_notebook, [file.filename for file in pr.get_files()])
 
 
-def kernel_image_for(notebook):
+def kernel_for(notebook):
     """Read the notebook and extract the kernel name, if any"""
     with open(notebook, "r") as f:
         nb = json.load(f)
@@ -66,10 +66,14 @@ def kernel_image_for(notebook):
         if md:
             ks = md.get("kernelspec")
             if ks:
-                kernel_name = ks["display_name"]
+                return ks["display_name"]
+    return None
+
+
+def kernel_image_for(notebook):
+    kernel_name = kernel_for(notebook)
 
     if kernel_name:
-        print(kernel_name)
         if kernel_name in NOTEBOOK_INSTANCE_KERNELS:
             return NOTEBOOK_INSTANCE_KERNELS[kernel_name]
         elif "Base Python" in kernel_name:
@@ -95,7 +99,6 @@ def main():
     instance_type = args.instance or "ml.m5.xlarge"
     for notebook in notebook_filenames(args.pr):
         image = kernel_image_for(notebook)
-        print(image)
         results[notebook] = run_notebook(
             image=image,
             notebook=notebook,
@@ -112,6 +115,8 @@ def main():
         print(f"* {basename} " + "*" * (77 - len(basename)))
         print("*")
         print(f"* {'job name':>11}: {job_name:<11}")
+        print("*")
+        print(f"* {'kernel':>11}: {kernel_for(notebook):<11}")
         print("*")
         print(f"* {'status':>11}: {status:<11}")
         print("*")

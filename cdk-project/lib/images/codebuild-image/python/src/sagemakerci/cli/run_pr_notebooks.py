@@ -6,28 +6,30 @@ import sys
 
 from sagemakerci.run_notebook import run_notebook
 
+import boto3
 from github import Github
 
-BASE_PYTHON_IMAGE = "521695447989.dkr.ecr.us-west-2.amazonaws.com/papermill-processing:latest"
-DATA_SCIENCE_IMAGE = "521695447989.dkr.ecr.us-west-2.amazonaws.com/papermill-processing:latest"
-MXNET_IMAGE = "521695447989.dkr.ecr.us-west-2.amazonaws.com/mxnet:241305b59a3dde0ad9b85e645a2adb216ffc022ddfd60541969b5f522eadbe4a"
-PYTORCH_IMAGE = "521695447989.dkr.ecr.us-west-2.amazonaws.com/pytorch:cc677286ac46d07e4f8ba9b888f8c102ae03eb8ae889206d93c0a1b6d415a183"
-TENSORFLOW_1_IMAGE = "521695447989.dkr.ecr.us-west-2.amazonaws.com/tensorflow-1:4526a3991b9b69ef572c0320471705e1a16ed3971a3be05fc2bfc3a46e830bef"
-TENSORFLOW_2_IMAGE = "521695447989.dkr.ecr.us-west-2.amazonaws.com/tensorflow-2:11dd30e958a2278bedcbc12b80bb37ef4a2cb503b095f2428b090b5ab334a101"
 
-NOTEBOOK_INSTANCE_KERNELS = {
-    "conda_mxnet_latest_p37": MXNET_IMAGE,
-    "conda_mxnet_p27": MXNET_IMAGE,
-    "conda_mxnet_p36": MXNET_IMAGE,
-    "conda_python2": BASE_PYTHON_IMAGE,
-    "conda_python3": BASE_PYTHON_IMAGE,
-    "conda_pytorch_latest_p36": PYTORCH_IMAGE,
-    "conda_pytorch_p27": PYTORCH_IMAGE,
-    "conda_pytorch_p36": PYTORCH_IMAGE,
-    "conda_tensorflow_p27": TENSORFLOW_1_IMAGE,
-    "conda_tensorflow_p36": TENSORFLOW_1_IMAGE,
-    "conda_tensorflow2_p36": TENSORFLOW_2_IMAGE,
-}
+def get_latest_image_digest(registry, repository):
+    client = boto3.client("ecr")
+    response = client.describe_images(
+        registryId=registry,
+        repositoryName=repository,
+        maxResults=1000,
+    )
+    images = response["imageDetails"]
+    return sorted(images, key=lambda image: image["imagePushedAt"], reverse=True)[0]["imageDigest"]
+
+
+CI_REGISTRY_ID = "521695447989"
+LL_REGISTRY_ID = "236514542706"
+
+BASE_PYTHON_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/papermill-processing:latest"
+DATA_SCIENCE_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/papermill-processing:latest"
+MXNET_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/mxnet@{get_latest_image_digest(CI_REGISTRY_ID, 'mxnet')}"
+PYTORCH_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/pytorch@{get_latest_image_digest(CI_REGISTRY_ID, 'pytorch')}"
+TENSORFLOW_1_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/tensorflow-1@{get_latest_image_digest(CI_REGISTRY_ID, 'tensorflow-1')}"
+TENSORFLOW_2_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/tensorflow-2@{get_latest_image_digest(CI_REGISTRY_ID, 'tensorflow-2')}"
 
 
 def parse_args(args):
@@ -74,20 +76,36 @@ def kernel_image_for(notebook):
     kernel_name = kernel_for(notebook)
 
     if kernel_name:
-        if kernel_name in NOTEBOOK_INSTANCE_KERNELS:
-            return NOTEBOOK_INSTANCE_KERNELS[kernel_name]
-        elif "Base Python" in kernel_name:
+        if any(
+            name in kernel_name
+            for name in ("Base Python", "Python 3", "conda_python2", "conda_python3")
+        ):
             return BASE_PYTHON_IMAGE
         elif "Data Science" in kernel_name:
             return DATA_SCIENCE_IMAGE
-        elif "MXNet" in kernel_name:
+        elif any(
+            name in kernel_name
+            for name in ("MXNet", "conda_mxnet_latest_p37", "conda_mxnet_p27", "conda_mxnet_p36")
+        ):
             return MXNET_IMAGE
-        elif "PyTorch" in kernel_name:
+        elif any(
+            name in kernel_name
+            for name in (
+                "PyTorch",
+                "conda_pytorch_latest_p36",
+                "conda_pytorch_p27",
+                "conda_pytorch_p36",
+            )
+        ):
             return PYTORCH_IMAGE
-        elif "TensorFlow 1" in kernel_name:
+        elif any(
+            name in kernel_name
+            for name in ("TensorFlow 1", "conda_tensorflow_p27", "conda_tensorflow_p36")
+        ):
             return TENSORFLOW_1_IMAGE
-        elif "TensorFlow 2" in kernel_name:
+        elif any(name in kernel_name for name in ("TensorFlow 2", "conda_tensorflow2_p36")):
             return TENSORFLOW_2_IMAGE
+
     return DATA_SCIENCE_IMAGE
 
 

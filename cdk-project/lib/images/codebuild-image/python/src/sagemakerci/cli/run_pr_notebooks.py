@@ -72,7 +72,7 @@ def kernel_for(notebook):
     return None
 
 
-def kernel_image_for(notebook):
+def kernel_type_for(notebook):
     kernel_name = kernel_for(notebook)
 
     if kernel_name:
@@ -80,14 +80,14 @@ def kernel_image_for(notebook):
             name in kernel_name
             for name in ("Base Python", "Python 3", "conda_python2", "conda_python3")
         ):
-            return BASE_PYTHON_IMAGE
+            return "Base Python"
         elif "Data Science" in kernel_name:
-            return DATA_SCIENCE_IMAGE
+            return "Data Science"
         elif any(
             name in kernel_name
             for name in ("MXNet", "conda_mxnet_latest_p37", "conda_mxnet_p27", "conda_mxnet_p36")
         ):
-            return MXNET_IMAGE
+            return "MXNet"
         elif any(
             name in kernel_name
             for name in (
@@ -97,14 +97,33 @@ def kernel_image_for(notebook):
                 "conda_pytorch_p36",
             )
         ):
-            return PYTORCH_IMAGE
+            return "PyTorch"
         elif any(
             name in kernel_name
             for name in ("TensorFlow 1", "conda_tensorflow_p27", "conda_tensorflow_p36")
         ):
-            return TENSORFLOW_1_IMAGE
+            return "TensorFlow 1"
         elif any(name in kernel_name for name in ("TensorFlow 2", "conda_tensorflow2_p36")):
-            return TENSORFLOW_2_IMAGE
+            return "TensorFlow 2"
+
+    return "Data Science"
+
+
+def kernel_image_for(notebook):
+    kernel_type = kernel_type_for(notebook)
+
+    if kernel_type == "Base Python":
+        return BASE_PYTHON_IMAGE
+    elif kernel_type == "Data Science":
+        return DATA_SCIENCE_IMAGE
+    elif kernel_type == "MXNet":
+        return MXNET_IMAGE
+    elif kernel_type == "PyTorch":
+        return PYTORCH_IMAGE
+    elif kernel_type == "TensorFlow 1":
+        return TENSORFLOW_1_IMAGE
+    elif kernel_type == "TensorFlow 2":
+        return TENSORFLOW_2_IMAGE
 
     return DATA_SCIENCE_IMAGE
 
@@ -134,7 +153,7 @@ def main():
         print("*")
         print(f"* {'job name':>11}: {job_name:<11}")
         print("*")
-        print(f"* {'kernel':>11}: {kernel_for(notebook):<11}")
+        print(f"* {'kernel':>11}: {kernel_type_for(notebook):<11}")
         print("*")
         print(f"* {'status':>11}: {status:<11}")
         print("*")

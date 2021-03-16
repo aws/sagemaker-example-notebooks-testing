@@ -24,8 +24,8 @@ def get_latest_image_digest(registry, repository):
 CI_REGISTRY_ID = "521695447989"
 LL_REGISTRY_ID = "236514542706"
 
-BASE_PYTHON_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/papermill-processing:latest"
-DATA_SCIENCE_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/papermill-processing:latest"
+BASE_PYTHON_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/base-python@{get_latest_image_digest(CI_REGISTRY_ID, 'base-python')}"
+DATA_SCIENCE_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/data-science@{get_latest_image_digest(CI_REGISTRY_ID, 'data-science')}"
 MXNET_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/mxnet@{get_latest_image_digest(CI_REGISTRY_ID, 'mxnet')}"
 PYTORCH_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/pytorch@{get_latest_image_digest(CI_REGISTRY_ID, 'pytorch')}"
 TENSORFLOW_1_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/tensorflow-1@{get_latest_image_digest(CI_REGISTRY_ID, 'tensorflow-1')}"

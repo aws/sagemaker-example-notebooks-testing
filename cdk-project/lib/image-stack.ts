@@ -35,17 +35,17 @@ export class ImageStack extends cdk.Stack {
 
         this.codeBuildImage = this.createCodeBuildImage("sagemaker-codebuild");
 
-        // this.basePythonImage = this.createProcessingImageFrom1P(
-        //     "base-python",
-        //     "sagemaker-base-python-environment",
-        //     "1.0",
-        // );
-        // this.dataScienceImage = this.createProcessingImageFrom1P(
-        //     "data-science",
-        //     "sagemaker-data-science-environment",
-        //     "1.0",
-        // );
-        //
+        this.basePythonImage = this.createProcessingImageFrom1P(
+            "base-python",
+            "sagemaker-base-python-environment",
+            "1.0",
+        );
+        this.dataScienceImage = this.createProcessingImageFrom1P(
+            "data-science",
+            "sagemaker-data-science-environment",
+            "1.0",
+        );
+
         this.mxnetImage = this.createProcessingImageFromDlc(
             "mxnet",
             "mxnet-training",
@@ -77,11 +77,16 @@ export class ImageStack extends cdk.Stack {
         return asset;
     }
 
-    createProcessingImage(name: string, baseImageUri: string): DockerImageAsset {
+    createProcessingImage(
+        name: string,
+        baseImageUri: string,
+        dockerfile: string,
+    ): DockerImageAsset {
         const pascal = changeCase.pascal(name);
         const asset = new DockerImageAsset(this, `${pascal}ProcessingImage`, {
             repositoryName: name,
             directory: path.join(__dirname, "images", "processing-image"),
+            file: dockerfile,
             buildArgs: {
                 BASE_IMAGE: baseImageUri,
             },
@@ -98,6 +103,7 @@ export class ImageStack extends cdk.Stack {
         return this.createProcessingImage(
             name,
             `236514542706.dkr.ecr.us-west-2.amazonaws.com/${baseImageRepository}:${baseImageTag}`,
+            "Dockerfile.1p",
         );
     }
 
@@ -109,6 +115,7 @@ export class ImageStack extends cdk.Stack {
         return this.createProcessingImage(
             name,
             `763104351884.dkr.ecr.us-west-2.amazonaws.com/${baseImageRepository}:${baseImageTag}`,
+            "Dockerfile.dlc",
         );
     }
 }

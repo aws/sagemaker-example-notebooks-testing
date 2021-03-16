@@ -29,6 +29,9 @@ COPY requirements.txt /tmp/requirements.txt
 RUN python3 -m pip install papermill jupyter nteract-scrapbook boto3 requests \
  && python3 -m pip install -r /tmp/requirements.txt
 
+# upgrade SageMaker Python SDK
+RUN python3 -m pip install sagemaker --upgrade
+
 ENV PYTHONUNBUFFERED=TRUE
 ENV PATH="/opt/program:${PATH}"
 

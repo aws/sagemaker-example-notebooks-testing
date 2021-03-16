@@ -149,7 +149,7 @@ def main():
         job_name, status, local, failure_reason = result
         print("\n" * 2)
         basename = os.path.basename(notebook)
-        print(f"* {basename} " + "*" * (77 - len(basename)))
+        print(f"* {basename} " + "*" * (97 - len(basename)))
         print("*")
         print(f"* {'job name':>11}: {job_name:<11}")
         print("*")
@@ -162,7 +162,7 @@ def main():
             failures[notebook] = failure_reason
 
     print("\n" * 2)
-    print("-" * 70)
+    print("-" * 100)
     if len(failures) > 0:
         raise Exception(
             "One or more notebooks failed to execute. Please see above for error messages. "

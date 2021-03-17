@@ -78,10 +78,14 @@ def kernel_type_for(notebook):
     if kernel_name:
         if any(
             name in kernel_name
-            for name in ("Base Python", "Python 3", "conda_python2", "conda_python3")
+            for name in (
+                "Data Science",
+                "Base Python",
+                "Python 3",
+                "conda_python2",
+                "conda_python3",
+            )
         ):
-            return "Base Python"
-        elif "Data Science" in kernel_name:
             return "Data Science"
         elif any(
             name in kernel_name

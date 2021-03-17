@@ -97,7 +97,10 @@ def run_notebook():
             ellipsis = "\n\n[...]\n\n"
             error_message = ellipsis + lines[-1]
             truncated_length = 1023 - len(error_message)
-            message = message[:truncated_length] + error_message
+            if truncated_length == 0:
+                message = lines[-1]
+            else:
+                message = message[:truncated_length] + error_message
 
         # Write to an error file. This will be returned as the failureReason in the
         # DescribeProcessingJob result.

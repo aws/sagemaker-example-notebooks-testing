@@ -82,9 +82,10 @@ def run_notebook():
         print("Notebook params = {}".format(params))
         arg_map = dict(kernel_name=kernel) if kernel else {}
         papermill.execute_notebook(
-            notebook_file,
-            output_notebook,
-            params,
+            input_path=notebook_file,
+            output_path=output_notebook,
+            parameters=params,
+            cwd=os.path.dirname(notebook_file),
             **arg_map,
         )
         print("Execution complete")

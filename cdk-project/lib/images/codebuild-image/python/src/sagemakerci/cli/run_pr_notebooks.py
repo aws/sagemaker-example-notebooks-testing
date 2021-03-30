@@ -5,6 +5,7 @@ import os
 import sys
 
 from sagemakerci.run_notebook import run_notebook
+from sagemakerci.git import Git
 
 import boto3
 from github import Github
@@ -52,8 +53,7 @@ def is_notebook(filename):
 
 
 def notebook_filenames(pr_num):
-    # token = sagemakerci.git.Git().oauth_token
-    g = Github()  # token)
+    g = Github(Git().oauth_token)
     repo = g.get_repo("aws/amazon-sagemaker-examples")
     pr = repo.get_pull(pr_num)
     return filter(is_notebook, [file.filename for file in pr.get_files()])

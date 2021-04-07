@@ -29,7 +29,7 @@ def parse_args(args):
 
 
 def notebook_filenames():
-    return list(Path(".").rglob("*.ipynb"))
+    return [str(filename) for filename in Path(".").rglob("*.ipynb")]
 
 
 def save_csv_to_s3(notebooks, job_names, kernels):
@@ -71,7 +71,7 @@ def main():
             notebook=notebook,
             instance_type=instance_type,
             session=session,
-            output_prefix=None,
+            output_prefix=get_output_prefix(),
             parameters={},
         )
 

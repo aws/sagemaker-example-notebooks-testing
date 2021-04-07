@@ -29,7 +29,7 @@ def parse_args(args):
 
 
 def notebook_filenames():
-    return Path("amazon-sagemaker-examples").rglob("*.ipynb")
+    return Path(".").rglob("*.ipynb")
 
 
 def save_csv_to_s3(notebooks, job_names):

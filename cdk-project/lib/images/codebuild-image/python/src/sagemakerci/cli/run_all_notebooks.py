@@ -8,7 +8,12 @@ from pathlib import Path
 
 import pandas as pd
 
-from sagemakerci.run_notebook import ensure_session, get_output_prefix, upload_notebook, execute_notebook
+from sagemakerci.run_notebook import (
+    ensure_session,
+    get_output_prefix,
+    upload_notebook,
+    execute_notebook,
+)
 from sagemakerci.cli.run_pr_notebooks import is_notebook, kernel_image_for
 from sagemakerci.utils import default_bucket
 
@@ -76,6 +81,7 @@ def main():
     print("-" * 100)
     print("\n" * 2)
     print(save_csv_to_s3(notebooks, job_names))
+
 
 if __name__ == "__main__":
     main()

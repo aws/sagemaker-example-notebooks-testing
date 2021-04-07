@@ -35,6 +35,26 @@ export function createFullRepoScanBuildSpec(): codebuild.BuildSpec {
                 commands: ["run-all-notebooks --instance $INSTANCE_TYPE"],
             },
         },
+        artifacts: {
+            files: ["*.csv"],
+            name: "ARTIFACT_1",
+        },
+    });
+}
+
+export function createRepoScanResultsBuildSpec(): codebuild.BuildSpec {
+    return codebuild.BuildSpec.fromObject({
+        version: "0.2",
+        env: {
+            variables: {
+                CSV_FILE: "$CODEBUILD_SRC_DIR_ARTIFACT_1/*.csv",
+            },
+        },
+        phases: {
+            build: {
+                commands: ["describe-notebook-jobs --csv $CSV_FILE"],
+            },
+        },
     });
 }
 

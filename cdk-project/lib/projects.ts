@@ -11,6 +11,7 @@ export const projects: Project[] = [
         computeType: codebuild.ComputeType.LARGE,
         timeout: Duration.minutes(480),
         releaseBuildSpec: buildspecs.createFullRepoScanBuildSpec(),
+        deployBuildSpec: buildspecs.createRepoScanResultsBuildSpec(),
         additionalBuildProjects: [
             // new Build({
             //     name: "sagemaker-examples-notebook-instance",

@@ -14,7 +14,7 @@ from sagemakerci.run_notebook import (
     upload_notebook,
     execute_notebook,
 )
-from sagemakerci.cli.run_pr_notebooks import is_notebook, kernel_image_for
+from sagemakerci.cli.run_pr_notebooks import is_notebook, kernel_image_for, kernel_type_for
 from sagemakerci.utils import default_bucket
 
 
@@ -32,10 +32,10 @@ def notebook_filenames():
     return list(Path(".").rglob("*.ipynb"))
 
 
-def save_csv_to_s3(notebooks, job_names):
+def save_csv_to_s3(notebooks, job_names, kernels):
     session = ensure_session()
 
-    df = pd.DataFrame({"filename": notebooks, "processing-job-name": job_names})
+    df = pd.DataFrame({"filename": notebooks, "processing-job-name": job_names, "kernel": kernels})
 
     csv_name = f"{time.strftime('%Y-%m-%d-%H-%M-%S', time.gmtime())}.csv"
     df.to_csv(csv_name)
@@ -58,6 +58,7 @@ def main():
 
     notebooks = notebook_filenames()
     job_names = []
+    kernels = []
 
     session = ensure_session()
     instance_type = args.instance or "ml.m5.xlarge"
@@ -76,11 +77,12 @@ def main():
 
         print(job_name)
         job_names.append(job_name)
+        kernels.append(kernel_type_for(notebook))
 
     print("\n" * 2)
     print("-" * 100)
     print("\n" * 2)
-    print(save_csv_to_s3(notebooks, job_names))
+    print(save_csv_to_s3(notebooks, job_names, kernels))
 
 
 if __name__ == "__main__":

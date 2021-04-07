@@ -16,12 +16,9 @@ from sagemakerci.utils import default_bucket
 def parse_args(args):
     parser = argparse.ArgumentParser(os.path.basename(__file__))
     parser.set_defaults(func=lambda x: parser.print_usage())
-    parser.add_argument("--pr", help="Pull request number", type=int, required=True)
     parser.add_argument("--instance", help="Instance type", type=str, required=False)
 
     parsed = parser.parse_args(args)
-    if not parsed.pr:
-        parser.error("--pr required")
 
     return parsed
 

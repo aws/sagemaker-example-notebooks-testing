@@ -22,6 +22,22 @@ export function createPullRequestBuildSpec(): codebuild.BuildSpec {
     });
 }
 
+export function createFullRepoScanBuildSpec(): codebuild.BuildSpec {
+    return codebuild.BuildSpec.fromObject({
+        version: "0.2",
+        env: {
+            variables: {
+                INSTANCE_TYPE: "ml.m5.xlarge",
+            },
+        },
+        phases: {
+            build: {
+                commands: ["run-all-notebooks --instance $INSTANCE_TYPE"],
+            },
+        },
+    });
+}
+
 export function createNotebookInstanceBuildSpec(): codebuild.BuildSpec {
     return codebuild.BuildSpec.fromObject({
         version: "0.2",

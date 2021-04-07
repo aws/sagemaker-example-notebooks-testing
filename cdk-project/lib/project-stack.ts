@@ -307,6 +307,7 @@ export class ProjectStack extends cdk.Stack {
                         time: stepfunctions.WaitTime.duration(cdk.Duration.hours(4)),
                     }),
                 }),
+                runOrder: 1,
             }),
         );
 
@@ -316,6 +317,7 @@ export class ProjectStack extends cdk.Stack {
                 project: deployProject,
                 input: sourceOutputArtifact,
                 extraInputs: additionalInputArtifacts,
+                runOrder: 2,
             }),
         );
 

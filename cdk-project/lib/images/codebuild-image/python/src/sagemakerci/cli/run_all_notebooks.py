@@ -78,6 +78,7 @@ def main():
         print(job_name)
         job_names.append(job_name)
         kernels.append(kernel_type_for(notebook))
+        time.sleep(1)
 
     print("\n" * 2)
     print("-" * 100)

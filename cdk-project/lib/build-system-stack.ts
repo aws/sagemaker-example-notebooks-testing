@@ -208,6 +208,7 @@ export class BuildSystemStack extends cdk.Stack {
             assumedBy: new iam.CompositePrincipal(
                 new iam.ServicePrincipal("codepipeline.amazonaws.com"),
                 new iam.ServicePrincipal("codebuild.amazonaws.com"),
+                new iam.ServicePrincipal("sagemaker.amazonaws.com"),
             ),
         });
 

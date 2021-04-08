@@ -38,7 +38,7 @@ def save_csv_to_s3(notebooks, job_names, kernels):
     df = pd.DataFrame({"filename": notebooks, "processing-job-name": job_names, "kernel": kernels})
 
     csv_name = f"{time.strftime('%Y-%m-%d-%H-%M-%S', time.gmtime())}.csv"
-    df.to_csv(csv_name)
+    df.to_csv(csv_name, index=False)
 
     s3 = session.client("s3")
     bucket = default_bucket(session)

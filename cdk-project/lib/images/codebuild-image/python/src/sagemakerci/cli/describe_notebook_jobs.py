@@ -34,7 +34,7 @@ def notebook_filenames():
 def save_csv_to_s3(df, csv_name):
     session = ensure_session()
 
-    df.to_csv(csv_name)
+    df.to_csv(csv_name, index=False)
 
     s3 = session.client("s3")
     bucket = default_bucket(session)

@@ -48,8 +48,8 @@ export function createRepoScanResultsBuildSpec(): codebuild.BuildSpec {
         phases: {
             build: {
                 commands: [
-                    "CSV_FILE='$CODEBUILD_SRC_DIR_ARTIFACT_1/*.csv'",
-                    "describe-notebook-jobs --csv $CSV_FILE",
+                    "cd $CODEBUILD_SRC_DIR_ARTIFACT_1",
+                    "describe-notebook-jobs --csv *.csv",
                 ],
             },
         },

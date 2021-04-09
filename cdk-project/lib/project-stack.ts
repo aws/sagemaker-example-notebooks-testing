@@ -293,6 +293,19 @@ export class ProjectStack extends cdk.Stack {
         });
         buildStage.addAction(buildAction);
 
+        const waitStage = pipeline.addStage({ stageName: "Wait" });
+
+        waitStage.addAction(
+            new cpa.StepFunctionInvokeAction({
+                actionName: "WaitAction",
+                stateMachine: new stepfunctions.StateMachine(this, "WaitStateMachine", {
+                    definition: new stepfunctions.Wait(this, "WaitForProcessingJobs", {
+                        time: stepfunctions.WaitTime.duration(cdk.Duration.hours(3)),
+                    }),
+                }),
+            }),
+        );
+
         const deployStage = pipeline.addStage({ stageName: "Deploy" });
         const additionalInputArtifacts =
             source === undefined
@@ -300,24 +313,11 @@ export class ProjectStack extends cdk.Stack {
                 : [sourceOutputArtifact, buildOutputArtifact];
 
         deployStage.addAction(
-            new cpa.StepFunctionInvokeAction({
-                actionName: "WaitAction",
-                stateMachine: new stepfunctions.StateMachine(this, "WaitStateMachine", {
-                    definition: new stepfunctions.Wait(this, "WaitForProcessingJobs", {
-                        time: stepfunctions.WaitTime.duration(cdk.Duration.hours(4)),
-                    }),
-                }),
-                runOrder: 1,
-            }),
-        );
-
-        deployStage.addAction(
             new cpa.CodeBuildAction({
                 actionName: "DeployAction",
                 project: deployProject,
                 input: sourceOutputArtifact,
                 extraInputs: additionalInputArtifacts,
-                runOrder: 2,
             }),
         );
 

@@ -62,7 +62,7 @@ def main():
         job_name = row["processing-job-name"]
         response = sagemaker.describe_processing_job(ProcessingJobName=job_name)
         statuses.append(response["ProcessingJobStatus"])
-        errors.append(response["FailureReason"] or "")
+        errors.append(response.get("FailureReason"))
         time.sleep(1)
 
     df["status"] = statuses

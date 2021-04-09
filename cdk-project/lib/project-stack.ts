@@ -9,6 +9,7 @@ import iam = require("@aws-cdk/aws-iam");
 import lambda = require("@aws-cdk/aws-lambda");
 import s3 = require("@aws-cdk/aws-s3");
 import sam = require("@aws-cdk/aws-sam");
+import stepfunctions = require("@aws-cdk/aws-stepfunctions");
 import changeCase = require("change-case");
 
 import common = require("./common");
@@ -299,11 +300,24 @@ export class ProjectStack extends cdk.Stack {
                 : [sourceOutputArtifact, buildOutputArtifact];
 
         deployStage.addAction(
+            new cpa.StepFunctionInvokeAction({
+                actionName: "WaitAction",
+                stateMachine: new stepfunctions.StateMachine(this, "WaitStateMachine", {
+                    definition: new stepfunctions.Wait(this, "WaitForProcessingJobs", {
+                        time: stepfunctions.WaitTime.duration(cdk.Duration.hours(4)),
+                    }),
+                }),
+                runOrder: 1,
+            }),
+        );
+
+        deployStage.addAction(
             new cpa.CodeBuildAction({
                 actionName: "DeployAction",
                 project: deployProject,
                 input: sourceOutputArtifact,
                 extraInputs: additionalInputArtifacts,
+                runOrder: 2,
             }),
         );
 

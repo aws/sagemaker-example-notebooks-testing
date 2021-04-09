@@ -22,6 +22,40 @@ export function createPullRequestBuildSpec(): codebuild.BuildSpec {
     });
 }
 
+export function createFullRepoScanBuildSpec(): codebuild.BuildSpec {
+    return codebuild.BuildSpec.fromObject({
+        version: "0.2",
+        env: {
+            variables: {
+                INSTANCE_TYPE: "ml.m5.xlarge",
+            },
+        },
+        phases: {
+            build: {
+                commands: ["run-all-notebooks --instance $INSTANCE_TYPE"],
+            },
+        },
+        artifacts: {
+            files: ["*.csv"],
+            name: "ARTIFACT_1",
+        },
+    });
+}
+
+export function createRepoScanResultsBuildSpec(): codebuild.BuildSpec {
+    return codebuild.BuildSpec.fromObject({
+        version: "0.2",
+        phases: {
+            build: {
+                commands: [
+                    "cd $CODEBUILD_SRC_DIR_ARTIFACT_1",
+                    "describe-notebook-jobs --csv *.csv",
+                ],
+            },
+        },
+    });
+}
+
 export function createNotebookInstanceBuildSpec(): codebuild.BuildSpec {
     return codebuild.BuildSpec.fromObject({
         version: "0.2",

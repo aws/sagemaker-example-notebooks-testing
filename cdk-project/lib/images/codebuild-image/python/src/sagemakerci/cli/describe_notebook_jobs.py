@@ -52,7 +52,7 @@ def main():
     session = ensure_session()
 
     csv_filename = args.csv
-    df = pd.read_csv(csv_filename)
+    df = pd.read_csv(csv_filename, index_col=False)
 
     statuses = []
     errors = []

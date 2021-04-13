@@ -12,7 +12,7 @@ export const projects: Project[] = [
         timeout: Duration.minutes(480),
         releaseBuildSpec: buildspecs.createFullRepoScanBuildSpec(),
         deployBuildSpec: buildspecs.createRepoScanResultsBuildSpec(),
-        releasePipelineScheduleExpression: "cron(0 0 1W * ? *)",
+        releasePipelineScheduleExpression: "cron(0 0 ? * SUN *)",
         additionalBuildProjects: [
             // new Build({
             //     name: "sagemaker-examples-notebook-instance",

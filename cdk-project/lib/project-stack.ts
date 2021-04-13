@@ -300,7 +300,7 @@ export class ProjectStack extends cdk.Stack {
                 actionName: "WaitAction",
                 stateMachine: new stepfunctions.StateMachine(this, "WaitStateMachine", {
                     definition: new stepfunctions.Wait(this, "WaitForProcessingJobs", {
-                        time: stepfunctions.WaitTime.duration(cdk.Duration.hours(3)),
+                        time: stepfunctions.WaitTime.duration(cdk.Duration.hours(8)),
                     }),
                 }),
             }),

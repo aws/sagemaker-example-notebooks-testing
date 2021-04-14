@@ -4,6 +4,7 @@ import os
 import sys
 import time
 
+from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
@@ -55,21 +56,34 @@ def main():
     csv_filename = args.csv
     df = pd.read_csv(csv_filename, index_col=False)
 
+    output_notebooks = []
+    runtimes = []
     statuses = []
     errors = []
-    output_notebooks = []
 
     sagemaker = session.client("sagemaker")
     for index, row in df.iterrows():
         job_name = row["processing-job-name"]
-        output_notebooks.append(get_output_notebook_s3_uri(job_name, session))
+
         response = sagemaker.describe_processing_job(ProcessingJobName=job_name)
-        statuses.append(response["ProcessingJobStatus"])
-        errors.append(response.get("ExitMessage"))
+
+        output_notebook = get_output_notebook_s3_uri(job_name, session)
+        runtime = response.get("ProcessingEndTime", datetime.now()) - response.get(
+            "ProcessingStartTime"
+        )
+        status = response.get("ProcessingJobStatus")
+        error = response.get("ExitMessage")
+
+        output_notebooks.append(output_notebook)
+        runtimes.append(runtime.total_seconds())
+        statuses.append(status)
+        errors.append(error)
+
         print(job_name)
         time.sleep(1)
 
     df["output notebook"] = output_notebooks
+    df["runtime"] = runtimes
     df["status"] = statuses
     df["error"] = errors
 

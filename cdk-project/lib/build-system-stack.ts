@@ -119,6 +119,8 @@ export class BuildSystemStack extends cdk.Stack {
     addPullRequestBuildPermissions(role: iam.Role): void {
         const policy = new iam.PolicyStatement();
         policy.addActions(
+            "athena:StartQueryExecution",
+            "athena:GetQueryExecution",
             "ec2:AssociateRouteTable",
             "ec2:AttachInternetGateway",
             "ec2:AuthorizeSecurityGroupIngress",
@@ -151,6 +153,11 @@ export class BuildSystemStack extends cdk.Stack {
             "elasticfilesystem:DeleteMountTarget",
             "fsx:CreateFileSystem",
             "fsx:DeleteFileSystem",
+            "glue:CreateTable",
+            "glue:DeleteTable",
+            "glue:GetTable",
+            "glue:CreateDatabase",
+            "glue:GetDatabase",
             "iam:GetRole",
             "iam:GetInstanceProfile",
             "iam:CreateInstanceProfile",

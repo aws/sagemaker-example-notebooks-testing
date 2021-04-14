@@ -254,6 +254,16 @@ def wait_for_complete(job_name, progress=True, sleep_time=10, session=None):
     return status, desc.get("ExitMessage")
 
 
+def get_output_notebook_s3_uri(job_name, session=None):
+    session = ensure_session(session)
+    client = session.client("sagemaker")
+    desc = client.describe_processing_job(ProcessingJobName=job_name)
+
+    prefix = desc["ProcessingOutputConfig"]["Outputs"][0]["S3Output"]["S3Uri"]
+    notebook = os.path.basename(desc["Environment"]["PAPERMILL_OUTPUT"])
+    return "{}/{}".format(prefix, notebook)
+
+
 def download_notebook(job_name, output=".", session=None):
     """Download the output notebook from a previously completed job.
 
@@ -266,13 +276,7 @@ def download_notebook(job_name, output=".", session=None):
     Returns:
       The filename of the downloaded notebook.
     """
-    session = ensure_session(session)
-    client = session.client("sagemaker")
-    desc = client.describe_processing_job(ProcessingJobName=job_name)
-
-    prefix = desc["ProcessingOutputConfig"]["Outputs"][0]["S3Output"]["S3Uri"]
-    notebook = os.path.basename(desc["Environment"]["PAPERMILL_OUTPUT"])
-    s3path = "{}/{}".format(prefix, notebook)
+    s3path = get_output_notebook_s3_uri(job_name, session)
 
     if not os.path.exists(output):
         try:

@@ -13,6 +13,7 @@ from sagemakerci.run_notebook import (
     get_output_prefix,
     upload_notebook,
     execute_notebook,
+    get_output_notebook_s3_uri,
 )
 from sagemakerci.utils import default_bucket
 
@@ -56,16 +57,19 @@ def main():
 
     statuses = []
     errors = []
+    output_notebooks = []
 
     sagemaker = session.client("sagemaker")
     for index, row in df.iterrows():
         job_name = row["processing-job-name"]
+        output_notebooks.append(get_output_notebook_s3_uri(job_name, session))
         response = sagemaker.describe_processing_job(ProcessingJobName=job_name)
         statuses.append(response["ProcessingJobStatus"])
         errors.append(response.get("ExitMessage"))
         print(job_name)
         time.sleep(1)
 
+    df["output notebook"] = output_notebooks
     df["status"] = statuses
     df["error"] = errors
 

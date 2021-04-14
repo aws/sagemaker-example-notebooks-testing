@@ -85,8 +85,9 @@ def run_notebook():
             input_path=notebook_file,
             output_path=output_notebook,
             parameters=params,
-            cwd=notebook_dir,
+            progress_bar=False,
             log_output=True,
+            cwd=notebook_dir,
             **arg_map,
         )
         print("Execution complete")

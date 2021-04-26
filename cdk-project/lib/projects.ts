@@ -9,9 +9,10 @@ export const projects: Project[] = [
     new Project({
         repo: Constants.exampleNotebooksRepo,
         computeType: codebuild.ComputeType.LARGE,
-        timeout: Duration.minutes(480),
+        timeout: Duration.minutes(120),
         releaseBuildSpec: buildspecs.createFullRepoScanBuildSpec(),
         deployBuildSpec: buildspecs.createRepoScanResultsBuildSpec(),
+        enableAutomaticRelease: true,
         releasePipelineScheduleExpression: "cron(0 0 ? * SUN *)",
         additionalBuildProjects: [
             // new Build({
@@ -30,7 +31,7 @@ export const projects: Project[] = [
     new Project({
         repo: "amazon-sagemaker-examples-staging",
         computeType: codebuild.ComputeType.LARGE,
-        timeout: Duration.minutes(480),
+        timeout: Duration.minutes(120),
         enableReleaseBuild: false,
         additionalBuildProjects: [
             // new Build({

@@ -1,6 +1,6 @@
 :warning: **Warning**: This repository is experimental software designed for trial use. It may change significantly in the future and there is no guarantee of support. Please do use it and give us feedback on what we could improve, but take its experimental nature into account.
 
-![SageMaker](https://github.com/aws/sagemaker-example-notebooks-testing/raw/master/branding/icon/sagemaker-banner.png)
+![SageMaker](https://github.com/aws/sagemaker-example-notebooks-testing/raw/main/branding/icon/sagemaker-banner.png)
 
 # SageMaker Example Notebooks Testing
 
@@ -19,10 +19,10 @@ It can be repurposed to build a CI system for your own Jupyter notebooks on Sage
 ## :balance_scale: License
 
 This library is licensed under the [Apache 2.0 License](http://aws.amazon.com/apache2.0/).
-For more details, please take a look at the [LICENSE](https://github.com/aws/sagemaker-example-notebooks-testing/blob/master/LICENSE) file.
+For more details, please take a look at the [LICENSE](https://github.com/aws/sagemaker-example-notebooks-testing/blob/main/LICENSE) file.
 
 ## :handshake: Contributing
 
 Contributions are welcome!
-Please read our [contributing guidelines](https://github.com/aws/sagemaker-example-notebooks-testing/blob/master/CONTRIBUTING.md)
+Please read our [contributing guidelines](https://github.com/aws/sagemaker-example-notebooks-testing/blob/main/CONTRIBUTING.md)
 if you'd like to open an issue or submit a pull request.

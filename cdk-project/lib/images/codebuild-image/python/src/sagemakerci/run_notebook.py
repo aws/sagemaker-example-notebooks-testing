@@ -278,7 +278,6 @@ def download_notebook(job_name, output=".", session=None):
     """Download the output notebook from a previously completed job.
 
     Args:
-      notebook (str): The local notebook to upload and run (required).
       job_name (str): The name of the SageMaker Processing Job that executed the notebook. (Required)
       output (str): The directory to copy the output file to. (Default: the current working directory)
       session (boto3.Session):

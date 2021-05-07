@@ -18,6 +18,7 @@ export class ImageStack extends cdk.Stack {
 
     readonly basePythonImage: DockerImageAsset;
     readonly dataScienceImage: DockerImageAsset;
+    readonly sparkImage: DockerImageAsset;
 
     readonly mxnetImage: DockerImageAsset;
     readonly pytorchImage: DockerImageAsset;
@@ -45,6 +46,7 @@ export class ImageStack extends cdk.Stack {
             "sagemaker-data-science-environment",
             "1.0",
         );
+        this.sparkImage = this.createProcessingImageFrom1P("spark", "sagemaker-sparkmagic", "1.0");
 
         this.mxnetImage = this.createProcessingImageFromDlc(
             "mxnet",

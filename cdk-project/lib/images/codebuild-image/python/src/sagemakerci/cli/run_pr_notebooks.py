@@ -10,6 +10,7 @@ from sagemakerci.run_notebook import (
     get_output_prefix,
     upload_notebook,
     execute_notebook,
+    wait_for_complete,
 )
 from sagemakerci.git import Git
 
@@ -182,7 +183,9 @@ def main():
         for notebook in list(jobs):
             job_name = jobs[notebook]
             if not is_running(job_name, session):
-                status, failure_reason = describe(job_name, session)
+                status, failure_reason = wait_for_complete(
+                    job_name, progress=False, session=session
+                )
                 basename = os.path.basename(notebook)
                 print("\n" * 2)
                 print(f"* {basename} " + "*" * (97 - len(basename)))

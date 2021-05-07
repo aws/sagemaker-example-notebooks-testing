@@ -106,7 +106,7 @@ def kernel_type_for(notebook):
             return "TensorFlow 1"
         elif any(name in kernel_name for name in ("TensorFlow 2", "conda_tensorflow2_p36")):
             return "TensorFlow 2"
-        elif any(name in kernel_name for name in ("Spark", "pysparkkernel")):
+        elif any(name in kernel_name for name in ("SparkMagic", "PySpark", "pysparkkernel")):
             return "Spark"
 
     return "Data Science"

@@ -3,8 +3,14 @@ import argparse
 import json
 import os
 import sys
+import time
 
-from sagemakerci.run_notebook import run_notebook
+from sagemakerci.run_notebook import (
+    ensure_session,
+    get_output_prefix,
+    upload_notebook,
+    execute_notebook,
+)
 from sagemakerci.git import Git
 
 import boto3
@@ -132,38 +138,60 @@ def kernel_image_for(notebook):
     return DATA_SCIENCE_IMAGE
 
 
+def describe(job_name):
+    client = boto3.client("sagemaker")
+    response = client.describe_processing_job(ProcessingJobName=job_name)
+    return response["ProcessingJobStatus"], response.get("ExitMessage")
+
+
+def is_running(job_name):
+    status, failure_reason = describe(job_name)
+    if status in ("InProgress", "Stopping"):
+        return True
+    return False
+
+
 def main():
     args = parse_args(sys.argv[1:])
 
-    results = {}
+    jobs = {}
 
+    session = ensure_session()
     instance_type = args.instance or "ml.m5.xlarge"
     for notebook in notebook_filenames(args.pr):
         image = kernel_image_for(notebook)
-        results[notebook] = run_notebook(
+        s3path = upload_notebook(notebook, session)
+        jobs[notebook] = execute_notebook(
             image=image,
+            input_path=s3path,
             notebook=notebook,
-            role="SageMakerRole",
             instance_type=instance_type,
+            session=session,
+            output_prefix=get_output_prefix(),
+            parameters={},
         )
 
     failures = {}
 
-    for notebook, result in results.items():
-        job_name, status, local, failure_reason = result
-        print("\n" * 2)
-        basename = os.path.basename(notebook)
-        print(f"* {basename} " + "*" * (97 - len(basename)))
-        print("*")
-        print(f"* {'job name':>11}: {job_name:<11}")
-        print("*")
-        print(f"* {'kernel':>11}: {kernel_type_for(notebook):<11}")
-        print("*")
-        print(f"* {'status':>11}: {status:<11}")
-        print("*")
-        if status != "Completed":
-            print(failure_reason)
-            failures[notebook] = failure_reason
+    while jobs:
+        for notebook, job_name in jobs.items():
+            if not is_running(job_name):
+                status, failure_reason = describe(job_name)
+                basename = os.path.basename(notebook)
+                print("\n" * 2)
+                print(f"* {basename} " + "*" * (97 - len(basename)))
+                print("*")
+                print(f"* {'job name':>11}: {job_name:<11}")
+                print("*")
+                print(f"* {'kernel':>11}: {kernel_type_for(notebook):<11}")
+                print("*")
+                print(f"* {'status':>11}: {status:<11}")
+                print("*")
+                if status != "Completed":
+                    print(failure_reason)
+                    failures[notebook] = failure_reason
+                jobs.pop(notebook)
+            time.sleep(1)
 
     print("\n" * 2)
     print("-" * 100)

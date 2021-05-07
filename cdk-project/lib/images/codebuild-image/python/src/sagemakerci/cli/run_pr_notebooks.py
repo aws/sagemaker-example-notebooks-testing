@@ -174,7 +174,8 @@ def main():
     failures = {}
 
     while jobs:
-        for notebook, job_name in jobs.items():
+        for notebook in list(jobs):
+            job_name = jobs[notebook]
             if not is_running(job_name):
                 status, failure_reason = describe(job_name)
                 basename = os.path.basename(notebook)

@@ -138,14 +138,15 @@ def kernel_image_for(notebook):
     return DATA_SCIENCE_IMAGE
 
 
-def describe(job_name):
-    client = boto3.client("sagemaker")
+def describe(job_name, session):
+    session = ensure_session(session)
+    client = session.client("sagemaker")
     response = client.describe_processing_job(ProcessingJobName=job_name)
     return response["ProcessingJobStatus"], response.get("ExitMessage")
 
 
-def is_running(job_name):
-    status, failure_reason = describe(job_name)
+def is_running(job_name, session):
+    status, failure_reason = describe(job_name, session)
     if status in ("InProgress", "Stopping"):
         return True
     return False
@@ -161,7 +162,7 @@ def main():
     for notebook in notebook_filenames(args.pr):
         image = kernel_image_for(notebook)
         s3path = upload_notebook(notebook, session)
-        jobs[notebook] = execute_notebook(
+        job_name = execute_notebook(
             image=image,
             input_path=s3path,
             notebook=notebook,
@@ -171,13 +172,17 @@ def main():
             parameters={},
         )
 
+        print(job_name)
+        jobs[notebook] = job_name
+        time.sleep(1)
+
     failures = {}
 
     while jobs:
         for notebook in list(jobs):
             job_name = jobs[notebook]
-            if not is_running(job_name):
-                status, failure_reason = describe(job_name)
+            if not is_running(job_name, session):
+                status, failure_reason = describe(job_name, session)
                 basename = os.path.basename(notebook)
                 print("\n" * 2)
                 print(f"* {basename} " + "*" * (97 - len(basename)))

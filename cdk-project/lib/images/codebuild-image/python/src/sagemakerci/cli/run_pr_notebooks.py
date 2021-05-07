@@ -190,7 +190,7 @@ def main():
                     print(failure_reason)
                     failures[notebook] = failure_reason
                 jobs.pop(notebook)
-            time.sleep(1)
+            time.sleep(10)
 
     print("\n" * 2)
     print("-" * 100)

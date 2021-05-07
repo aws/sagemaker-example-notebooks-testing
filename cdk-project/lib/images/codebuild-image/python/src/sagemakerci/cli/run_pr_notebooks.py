@@ -115,11 +115,7 @@ def kernel_type_for(notebook):
 def kernel_image_for(notebook):
     kernel_type = kernel_type_for(notebook)
 
-    if kernel_type == "Base Python":
-        return BASE_PYTHON_IMAGE
-    elif kernel_type == "Data Science":
-        return DATA_SCIENCE_IMAGE
-    elif kernel_type == "MXNet":
+    if kernel_type == "MXNet":
         return MXNET_IMAGE
     elif kernel_type == "PyTorch":
         return PYTORCH_IMAGE

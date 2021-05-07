@@ -167,13 +167,13 @@ def main():
             image=image,
             input_path=s3path,
             notebook=notebook,
+            role="SageMakerRole",
             instance_type=instance_type,
             session=session,
             output_prefix=get_output_prefix(),
             parameters={},
         )
 
-        print(job_name)
         jobs[notebook] = job_name
         time.sleep(1)
 

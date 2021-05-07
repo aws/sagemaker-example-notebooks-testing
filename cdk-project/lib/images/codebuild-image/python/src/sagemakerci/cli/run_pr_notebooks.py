@@ -38,6 +38,7 @@ MXNET_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/mxnet@{get_late
 PYTORCH_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/pytorch@{get_latest_image_digest(CI_REGISTRY_ID, 'pytorch')}"
 TENSORFLOW_1_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/tensorflow-1@{get_latest_image_digest(CI_REGISTRY_ID, 'tensorflow-1')}"
 TENSORFLOW_2_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/tensorflow-2@{get_latest_image_digest(CI_REGISTRY_ID, 'tensorflow-2')}"
+SPARK_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/spark@{get_latest_image_digest(CI_REGISTRY_ID, 'spark')}"
 
 
 def parse_args(args):
@@ -85,17 +86,6 @@ def kernel_type_for(notebook):
     if kernel_name:
         if any(
             name in kernel_name
-            for name in (
-                "Data Science",
-                "Base Python",
-                "Python 3",
-                "conda_python2",
-                "conda_python3",
-            )
-        ):
-            return "Data Science"
-        elif any(
-            name in kernel_name
             for name in ("MXNet", "conda_mxnet_latest_p37", "conda_mxnet_p27", "conda_mxnet_p36")
         ):
             return "MXNet"
@@ -116,6 +106,8 @@ def kernel_type_for(notebook):
             return "TensorFlow 1"
         elif any(name in kernel_name for name in ("TensorFlow 2", "conda_tensorflow2_p36")):
             return "TensorFlow 2"
+        elif any(name in kernel_name for name in ("Spark", "pysparkkernel")):
+            return "Spark"
 
     return "Data Science"
 
@@ -135,6 +127,8 @@ def kernel_image_for(notebook):
         return TENSORFLOW_1_IMAGE
     elif kernel_type == "TensorFlow 2":
         return TENSORFLOW_2_IMAGE
+    elif kernel_type == "Spark":
+        return SPARK_IMAGE
 
     return DATA_SCIENCE_IMAGE
 

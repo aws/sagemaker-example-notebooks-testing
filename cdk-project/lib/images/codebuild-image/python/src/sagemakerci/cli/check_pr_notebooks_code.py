@@ -3,8 +3,8 @@ import argparse
 import os
 import sys
 
-from black import WriteBack
-from black_nb.cli import format_file_in_place
+import black
+from black_nb.cli import format_file_in_place, SubReport, TARGET_VERSIONS
 
 from sagemakerci.cli.run_pr_notebooks import notebook_filenames
 
@@ -22,7 +22,20 @@ def parse_args(args):
 
 
 def check_code_format(notebook):
-    report = format_file_in_place(src=notebook, write_back=WriteBack.CHECK)
+    write_back = black.WriteBack.CHECK
+    mode = black.Mode(
+        target_versions=TARGET_VERSIONS,
+        line_length=100,
+        is_pyi=False,
+        string_normalization=True,
+    )
+    report = format_file_in_place(
+        src=notebook,
+        write_back=write_back,
+        mode=mode,
+        clear_output=False,
+        sub_report=SubReport(write_back=write_back),
+    )
     print(str(report))
     if (report.change_count > 0) or (report.failure_count > 0):
         return False, report

@@ -26,7 +26,7 @@ def markdown_cells(notebook):
 
 def check_grammar(notebook):
     cells = markdown_cells(notebook)
-    tool = language_tool_python.LanguageTool('en-US')
+    tool = language_tool_python.LanguageTool("en-US")
     return None, None
 
 

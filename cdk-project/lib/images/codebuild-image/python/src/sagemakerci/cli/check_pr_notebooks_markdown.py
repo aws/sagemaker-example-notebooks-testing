@@ -176,11 +176,15 @@ vocab = {
     "XGBoost",
     "NumPy",
     "SciPy",
+    "hyperparameters",
+    "Experiments",
 }
 
 rules_to_ignore = {
     "PUNCTUATION_PARAGRAPH_END",
     "WORD_CONTAINS_UNDERSCORE",
+    "DASH_RULE",
+    "EN_QUOTES",
 }
 
 

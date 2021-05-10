@@ -4,7 +4,7 @@ import os
 import sys
 
 from black import WriteBack
-from black_nb import format_file_in_place
+from black_nb.cli import format_file_in_place
 
 from sagemakerci.cli.run_pr_notebooks import notebook_filenames
 

@@ -3,7 +3,7 @@ import argparse
 import os
 import sys
 
-# import sagemakerci.git
+from sagemakerci.git import Git
 
 from github import Github
 
@@ -29,8 +29,7 @@ def is_notebook(filename):
 def main():
     args = parse_args(sys.argv[1:])
 
-    # token = sagemakerci.git.Git().oauth.token
-    g = Github()  # token)
+    g = Github(Git().oauth_token)
     repo = g.get_repo("aws/amazon-sagemaker-examples")
     pr = repo.get_pull(args.pr)
     filenames = filter(is_notebook, [file.filename for file in pr.get_files()])

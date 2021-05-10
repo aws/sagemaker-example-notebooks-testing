@@ -22,6 +22,40 @@ export function createPullRequestBuildSpec(): codebuild.BuildSpec {
     });
 }
 
+export function createCodeFormattingBuildSpec(): codebuild.BuildSpec {
+    return codebuild.BuildSpec.fromObject({
+        version: "0.2",
+        phases: {
+            pre_build: {
+                commands: [
+                    `PR_NUM=$(echo $CODEBUILD_SOURCE_VERSION | grep -o "[0-9]\\+")`,
+                    `echo "Checking code formatting in notebooks for PR $PR_NUM"`,
+                ],
+            },
+            build: {
+                commands: ["check-pr-notebooks-code --pr $PR_NUM"],
+            },
+        },
+    });
+}
+
+export function createGrammarBuildSpec(): codebuild.BuildSpec {
+    return codebuild.BuildSpec.fromObject({
+        version: "0.2",
+        phases: {
+            pre_build: {
+                commands: [
+                    `PR_NUM=$(echo $CODEBUILD_SOURCE_VERSION | grep -o "[0-9]\\+")`,
+                    `echo "Checking grammar in notebooks for PR $PR_NUM"`,
+                ],
+            },
+            build: {
+                commands: ["check-pr-notebooks-markdown --pr $PR_NUM"],
+            },
+        },
+    });
+}
+
 export function createFullRepoScanBuildSpec(): codebuild.BuildSpec {
     return codebuild.BuildSpec.fromObject({
         version: "0.2",

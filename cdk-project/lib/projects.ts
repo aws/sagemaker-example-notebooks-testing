@@ -1,6 +1,6 @@
 import codebuild = require("@aws-cdk/aws-codebuild");
 
-import { Constants, Project } from "./common";
+import { Constants, Project, Build } from "./common";
 import { Duration } from "@aws-cdk/core";
 
 import buildspecs = require("./buildspecs");
@@ -20,9 +20,14 @@ export const projects: Project[] = [
             //     pullRequestBuildSpec: buildspecs.createNotebookInstanceBuildSpec(),
             //     computeType: codebuild.ComputeType.LARGE,
             // }),
+            new Build({
+                name: "sagemaker-examples-code-formatting",
+                pullRequestBuildSpec: buildspecs.createCodeFormattingBuildSpec(),
+                computeType: codebuild.ComputeType.LARGE,
+            }),
             // new Build({
-            //     name: "sagemaker-examples-best-practices",
-            //     pullRequestBuildSpec: buildspecs.createBestPracticesBuildSpec(),
+            //     name: "sagemaker-examples-grammar",
+            //     pullRequestBuildSpec: buildspecs.createGrammarBuildSpec(),
             //     computeType: codebuild.ComputeType.LARGE,
             // }),
         ],
@@ -40,8 +45,13 @@ export const projects: Project[] = [
             //     computeType: codebuild.ComputeType.LARGE,
             // }),
             // new Build({
-            //     name: "sagemaker-examples-best-practices",
-            //     pullRequestBuildSpec: buildspecs.createBestPracticesBuildSpec(),
+            //     name: "sagemaker-examples-code-formatting",
+            //     pullRequestBuildSpec: buildspecs.createCodeFormattingBuildSpec(),
+            //     computeType: codebuild.ComputeType.LARGE,
+            // }),
+            // new Build({
+            //     name: "sagemaker-examples-grammar",
+            //     pullRequestBuildSpec: buildspecs.createGrammarBuildSpec(),
             //     computeType: codebuild.ComputeType.LARGE,
             // }),
         ],

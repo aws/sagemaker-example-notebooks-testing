@@ -58,7 +58,7 @@ def main():
             print("\n" * 2)
             print(f"* {basename} " + "*" * (97 - len(basename)))
             print()
-            print("\n".join(report))
+            print("\n\n".join([str(match) for match in report]))
 
     print("\n" * 2)
     print("-" * 100)

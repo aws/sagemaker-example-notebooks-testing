@@ -232,8 +232,8 @@ def check_grammar(notebook):
             matches = tool.check(stripped_line)
             report.extend(matches)
 
-    is_correctly_spelled = (
-        lambda rule: rule.ruleIssueType == "misspelling" and rule.matchedText in vocab
+    is_correctly_spelled = lambda rule: rule.ruleIssueType == "misspelling" and (
+        rule.matchedText in vocab or "-" in rule.matchedText
     )
     report = [rule for rule in report if not is_correctly_spelled(rule)]
 

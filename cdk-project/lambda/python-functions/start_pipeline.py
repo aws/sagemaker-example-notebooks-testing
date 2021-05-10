@@ -110,12 +110,8 @@ def handler(event, context):  # pylint: disable=unused-argument
     logger.info(event)
 
     pipeline_name = event["pipelineName"]
-    source = event["source"]
 
-    if changes_since_last_release(source):
-        start_pipeline(pipeline_name)
-    else:
-        logger.info("no changes, skipping release build")
+    start_pipeline(pipeline_name)
 
 
 # initialize git

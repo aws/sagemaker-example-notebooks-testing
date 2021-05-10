@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import json
 import os
 import sys
 
@@ -21,13 +22,27 @@ def parse_args(args):
 
 
 def markdown_cells(notebook):
-    pass
+    with open(notebook) as notebook_file:
+        cells = json.load(notebook_file)["cells"]
+    md_cells = []
+    for cell in cells:
+        if cell["cell_type"] == "markdown":
+            md_cells.append(cell["source"])
+    return md_cells
 
 
 def check_grammar(notebook):
-    cells = markdown_cells(notebook)
     tool = language_tool_python.LanguageTool("en-US")
-    return None, None
+
+    report = []
+
+    cells = markdown_cells(notebook)
+    for cell in cells:
+        for line in cell:
+            stripped_line = line.rstrip().strip(" #*")
+            matches = tool.check(stripped_line)
+            report.extend(matches)
+    return report
 
 
 def main():
@@ -36,14 +51,14 @@ def main():
     failures = {}
 
     for notebook in notebook_filenames(args.pr):
-        failed, report = check_grammar(notebook)
-        if failed:
+        report = check_grammar(notebook)
+        if report:
             failures[notebook] = report
             basename = os.path.basename(notebook)
             print("\n" * 2)
             print(f"* {basename} " + "*" * (97 - len(basename)))
-            print("*")
-            print(str(report))
+            print()
+            print("\n".join(report))
 
     print("\n" * 2)
     print("-" * 100)

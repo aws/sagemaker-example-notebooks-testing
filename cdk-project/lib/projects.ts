@@ -25,11 +25,11 @@ export const projects: Project[] = [
                 pullRequestBuildSpec: buildspecs.createCodeFormattingBuildSpec(),
                 computeType: codebuild.ComputeType.LARGE,
             }),
-            // new Build({
-            //     name: "sagemaker-examples-grammar",
-            //     pullRequestBuildSpec: buildspecs.createGrammarBuildSpec(),
-            //     computeType: codebuild.ComputeType.LARGE,
-            // }),
+            new Build({
+                name: "sagemaker-examples-grammar",
+                pullRequestBuildSpec: buildspecs.createGrammarBuildSpec(),
+                computeType: codebuild.ComputeType.LARGE,
+            }),
         ],
     }),
 

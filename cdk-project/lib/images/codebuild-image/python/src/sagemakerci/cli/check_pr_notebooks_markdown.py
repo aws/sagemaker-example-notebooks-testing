@@ -49,8 +49,8 @@ def main():
     print("-" * 100)
     if len(failures) > 0:
         raise Exception(
-            "One or more notebooks did not pass the code formatting check. Please see above for error messages. "
-            "To reformat the code in your notebook, use black-nb: https://pypi.org/project/black-nb/"
+            "One or more notebooks did not pass the spelling and grammar check. Please see above for error messages. "
+            "To fix the text in your notebook, use language_tool_python.utils.correct: https://pypi.org/project/language-tool-python/"
         )
 
 

@@ -55,14 +55,16 @@ def main():
             print("\n" * 2)
             print(f"* {basename} " + "*" * (97 - len(basename)))
             print("*")
-            print(str(report))
+            print(f"* {'report':>11}: {str(report):<11}")
+            print("*")
 
     print("\n" * 2)
     print("-" * 100)
     if len(failures) > 0:
         raise Exception(
             "One or more notebooks did not pass the code formatting check. Please see above for error messages. "
-            "To reformat the code in your notebook, use black-nb: https://pypi.org/project/black-nb/"
+            "To reformat the code in your notebook, use black-nb: https://pypi.org/project/black-nb/ "
+            "Run the command `black -l 100 your_notebook_file.ipynb`"
         )
 
 

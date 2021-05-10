@@ -176,6 +176,7 @@ vocab = {
     "XGBoost",
     "NumPy",
     "SciPy",
+    "hyperparameter",
     "hyperparameters",
     "Experiments",
     "csv",
@@ -184,6 +185,8 @@ vocab = {
     "URI",
     "json",
     "JSON",
+    "serializers",
+    "deserializers",
 }
 
 rules_to_ignore = {
@@ -191,6 +194,7 @@ rules_to_ignore = {
     "WORD_CONTAINS_UNDERSCORE",
     "DASH_RULE",
     "EN_QUOTES",
+    "WRONG_APOSTROPHE",
 }
 
 

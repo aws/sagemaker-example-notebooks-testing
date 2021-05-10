@@ -46,7 +46,7 @@ export function createGrammarBuildSpec(): codebuild.BuildSpec {
             pre_build: {
                 commands: [
                     `PR_NUM=$(echo $CODEBUILD_SOURCE_VERSION | grep -o "[0-9]\\+")`,
-                    `echo "Checking grammar in notebooks for PR $PR_NUM"`,
+                    `echo "Checking spelling and grammar in notebooks for PR $PR_NUM"`,
                 ],
             },
             build: {

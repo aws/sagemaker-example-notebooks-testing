@@ -178,6 +178,12 @@ vocab = {
     "SciPy",
     "hyperparameters",
     "Experiments",
+    "csv",
+    "CSV",
+    "uri",
+    "URI",
+    "json",
+    "JSON",
 }
 
 rules_to_ignore = {

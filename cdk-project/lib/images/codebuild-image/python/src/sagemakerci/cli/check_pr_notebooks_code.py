@@ -38,8 +38,8 @@ def check_code_format(notebook):
     )
     print(str(report))
     if (report.change_count > 0) or (report.failure_count > 0):
-        return False, report
-    return True, report
+        return True, report
+    return False, report
 
 
 def main():

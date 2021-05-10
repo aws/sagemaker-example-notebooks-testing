@@ -64,7 +64,7 @@ def main():
         raise Exception(
             "One or more notebooks did not pass the code formatting check. Please see above for error messages. "
             "To reformat the code in your notebook, use black-nb: https://pypi.org/project/black-nb/ "
-            "Run the command `black -l 100 your_notebook_file.ipynb`"
+            "Run the command `black-nb -l 100 your_notebook_file.ipynb`"
         )
 
 

@@ -173,6 +173,9 @@ vocab = {
     "RNN",
     "CNN",
     "LSTM",
+    "XGBoost",
+    "NumPy",
+    "SciPy",
 }
 
 rules_to_ignore = {

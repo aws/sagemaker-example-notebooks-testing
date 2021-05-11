@@ -13,6 +13,7 @@ allow_list = {
     "Alexa",
     "Amazon",
     "AWS",
+    "aws",
     "Amplify",
     "API",
     "Gateway",
@@ -20,6 +21,7 @@ allow_list = {
     "AppStream",
     "AppSync",
     "ARN",
+    "arn",
     "Athena",
     "A2I",
     "Aurora",
@@ -439,6 +441,8 @@ allow_list = {
     "stdout",
     "BlazingText",
     "SparkML",
+    "Jupyter",
+    "JupyterLab",
 }
 
 rules_to_ignore = {

@@ -14,7 +14,7 @@ from sagemakerci.run_notebook import (
     get_output_prefix,
     upload_notebook,
     execute_notebook,
-    get_output_notebook_s3_uri,
+    get_output_notebook,
 )
 from sagemakerci.utils import default_bucket
 
@@ -67,14 +67,14 @@ def main():
 
         response = sagemaker.describe_processing_job(ProcessingJobName=job_name)
 
-        output_notebook = get_output_notebook_s3_uri(job_name, session)
+        notebook, uri = get_output_notebook(job_name, session)
         runtime = response.get("ProcessingEndTime", datetime.now()) - response.get(
             "ProcessingStartTime"
         )
         status = response.get("ProcessingJobStatus")
         error = response.get("ExitMessage")
 
-        output_notebooks.append(output_notebook)
+        output_notebooks.append(uri)
         runtimes.append(runtime.total_seconds())
         statuses.append(status)
         errors.append(error)

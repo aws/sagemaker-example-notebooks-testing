@@ -437,6 +437,8 @@ allow_list = {
     "TreeDepth",
     "stdin",
     "stdout",
+    "BlazingText",
+    "SparkML",
 }
 
 rules_to_ignore = {

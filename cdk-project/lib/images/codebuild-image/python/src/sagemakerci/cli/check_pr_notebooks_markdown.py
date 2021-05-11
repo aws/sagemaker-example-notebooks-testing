@@ -435,6 +435,8 @@ allow_list = {
     "Confusion",
     "FeatureImportanceOverweight",
     "TreeDepth",
+    "stdin",
+    "stdout",
 }
 
 rules_to_ignore = {
@@ -481,7 +483,10 @@ def check_grammar(notebook):
             report.extend(matches)
 
     is_correctly_spelled = lambda rule: rule.ruleIssueType == "misspelling" and (
-        rule.matchedText in allow_list or "-" in rule.matchedText
+        rule.matchedText in allow_list
+        or "-" in rule.matchedText
+        or "_" in rule.matchedText
+        or "$" in rule.matchedText
     )
     report = [rule for rule in report if not is_correctly_spelled(rule)]
 

@@ -27,6 +27,13 @@ def parse_args(args):
     parser = argparse.ArgumentParser(os.path.basename(__file__))
     parser.set_defaults(func=lambda x: parser.print_usage())
     parser.add_argument("--instance", help="Instance type", type=str, required=False)
+    parser.add_argument(
+        "--skip-docker",
+        default=True,
+        help="Skip notebooks that use Docker",
+        type=bool,
+        required=False,
+    )
 
     parsed = parser.parse_args(args)
 
@@ -68,7 +75,7 @@ def main():
     session = ensure_session()
     instance_type = args.instance or "ml.m5.xlarge"
     for notebook in notebooks:
-        if contains_code(notebook, ["docker ", 'instance_type = "local"']):
+        if args.skip_docker and contains_code(notebook, ["docker ", 'instance_type = "local"']):
             job_name = None
         else:
             image = kernel_image_for(notebook)

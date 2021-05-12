@@ -213,7 +213,7 @@ def main():
                 print("\n" * 2)
                 print(f"* {basename} " + "*" * (97 - len(basename)))
                 print("*")
-                print(f"* {'job name':>11}: {job_name:<11}")
+                print(f"* {'job name':>11}: {str(job_name):<11}")
                 print("*")
                 print(f"* {'kernel':>11}: {kernel_type_for(notebook):<11}")
                 print("*")

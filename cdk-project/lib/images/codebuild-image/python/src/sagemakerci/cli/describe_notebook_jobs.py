@@ -67,15 +67,22 @@ def main():
 
         response = sagemaker.describe_processing_job(ProcessingJobName=job_name)
 
-        notebook, uri = get_output_notebook(job_name, session)
-        runtime = response.get("ProcessingEndTime", datetime.now()) - response.get(
-            "ProcessingStartTime"
-        )
-        status = response.get("ProcessingJobStatus")
-        error = response.get("ExitMessage")
+        if job_name == "None":
+            uri = "None"
+            runtime = 0
+            status = "Skipped"
+            error = "This notebook was skipped because it either uses Docker or Local Mode."
+        else:
+            notebook, uri = get_output_notebook(job_name, session)
+            runtime = (
+                response.get("ProcessingEndTime", datetime.now())
+                - response.get("ProcessingStartTime")
+            ).total_seconds()
+            status = response.get("ProcessingJobStatus")
+            error = response.get("ExitMessage")
 
         output_notebooks.append(uri)
-        runtimes.append(runtime.total_seconds())
+        runtimes.append(runtime)
         statuses.append(status)
         errors.append(error)
 

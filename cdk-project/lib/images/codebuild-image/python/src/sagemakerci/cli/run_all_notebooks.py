@@ -14,7 +14,12 @@ from sagemakerci.run_notebook import (
     upload_notebook,
     execute_notebook,
 )
-from sagemakerci.cli.run_pr_notebooks import is_notebook, kernel_image_for, kernel_type_for
+from sagemakerci.cli.run_pr_notebooks import (
+    is_notebook,
+    kernel_image_for,
+    kernel_type_for,
+    contains_code,
+)
 from sagemakerci.utils import default_bucket
 
 
@@ -63,22 +68,25 @@ def main():
     session = ensure_session()
     instance_type = args.instance or "ml.m5.xlarge"
     for notebook in notebooks:
-        image = kernel_image_for(notebook)
-        s3path = upload_notebook(notebook, session)
-        job_name = execute_notebook(
-            image=image,
-            input_path=s3path,
-            notebook=notebook,
-            instance_type=instance_type,
-            session=session,
-            output_prefix=get_output_prefix(),
-            parameters={},
-        )
+        if contains_code(notebook, ["docker ", 'instance_type = "local"']):
+            job_name = None
+        else:
+            image = kernel_image_for(notebook)
+            s3path = upload_notebook(notebook, session)
+            job_name = execute_notebook(
+                image=image,
+                input_path=s3path,
+                notebook=notebook,
+                instance_type=instance_type,
+                session=session,
+                output_prefix=get_output_prefix(),
+                parameters={},
+            )
+            time.sleep(1)
 
         print(job_name)
-        job_names.append(job_name)
+        job_names.append(str(job_name))
         kernels.append(kernel_type_for(notebook))
-        time.sleep(1)
 
     print("\n" * 2)
     print("-" * 100)

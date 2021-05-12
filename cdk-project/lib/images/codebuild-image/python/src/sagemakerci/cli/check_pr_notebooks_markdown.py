@@ -448,6 +448,8 @@ allow_list = {
     "ML",
     "xlarge",
     "GPU",
+    "checkpoint",
+    "checkpointed",
 }
 
 rules_to_ignore = {
@@ -488,8 +490,13 @@ def check_grammar(notebook):
 
     cells = markdown_cells(notebook)
     for cell in cells:
+        code_block = False
         for line in cell:
             stripped_line = line.rstrip().strip(" #*")
+            if stripped_line in ("```python", "```"):
+                code_block = not code_block
+            if code_block:
+                continue
             code_substituted_line = re.sub(
                 "(`)\1{2,}[^`]*(`)\1{2,}|`[^`]*`", "[code]", stripped_line
             )

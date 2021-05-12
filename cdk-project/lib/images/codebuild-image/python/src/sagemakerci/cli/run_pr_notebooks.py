@@ -137,9 +137,32 @@ def describe(job_name, session):
 
 
 def is_running(job_name, session):
+    if not job_name:
+        return False
     status, failure_reason = describe(job_name, session)
     if status in ("InProgress", "Stopping"):
         return True
+    return False
+
+
+def code_cells(notebook):
+    with open(notebook) as notebook_file:
+        cells = json.load(notebook_file)["cells"]
+    code_cells = []
+    for cell in cells:
+        if cell["cell_type"] == "code":
+            code_cells.append(cell["source"])
+    return code_cells
+
+
+def contains_code(notebook, snippets):
+    cells = code_cells(notebook)
+
+    for cell in cells:
+        for line in cell:
+            if any(snippet in line for snippet in snippets):
+                return True
+
     return False
 
 
@@ -151,21 +174,24 @@ def main():
     session = ensure_session()
     instance_type = args.instance or "ml.m5.xlarge"
     for notebook in notebook_filenames(args.pr):
-        image = kernel_image_for(notebook)
-        s3path = upload_notebook(notebook, session)
-        job_name = execute_notebook(
-            image=image,
-            input_path=s3path,
-            notebook=notebook,
-            role="SageMakerRole",
-            instance_type=instance_type,
-            session=session,
-            output_prefix=get_output_prefix(),
-            parameters={},
-        )
+        if contains_code(notebook, ["docker ", 'instance_type = "local"']):
+            job_name = None
+        else:
+            image = kernel_image_for(notebook)
+            s3path = upload_notebook(notebook, session)
+            job_name = execute_notebook(
+                image=image,
+                input_path=s3path,
+                notebook=notebook,
+                role="SageMakerRole",
+                instance_type=instance_type,
+                session=session,
+                output_prefix=get_output_prefix(),
+                parameters={},
+            )
+            time.sleep(1)
 
         jobs[notebook] = job_name
-        time.sleep(1)
 
     failures = {}
 
@@ -173,9 +199,16 @@ def main():
         for notebook in list(jobs):
             job_name = jobs[notebook]
             if not is_running(job_name, session):
-                status, failure_reason = wait_for_complete(
-                    job_name, progress=False, session=session
-                )
+                if job_name:
+                    status, failure_reason = wait_for_complete(
+                        job_name, progress=False, session=session
+                    )
+                else:
+                    status, failure_reason = (
+                        "Skipped",
+                        "This notebook was skipped because it either uses Docker or Local Mode.",
+                    )
+
                 basename = os.path.basename(notebook)
                 print("\n" * 2)
                 print(f"* {basename} " + "*" * (97 - len(basename)))

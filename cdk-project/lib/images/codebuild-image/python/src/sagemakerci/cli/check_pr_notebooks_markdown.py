@@ -2,6 +2,7 @@
 import argparse
 import json
 import os
+import re
 import sys
 
 import language_tool_python
@@ -443,6 +444,10 @@ allow_list = {
     "SparkML",
     "Jupyter",
     "JupyterLab",
+    "ml",
+    "ML",
+    "xlarge",
+    "GPU",
 }
 
 rules_to_ignore = {
@@ -485,7 +490,10 @@ def check_grammar(notebook):
     for cell in cells:
         for line in cell:
             stripped_line = line.rstrip().strip(" #*")
-            matches = tool.check(stripped_line)
+            code_substituted_line = re.sub(
+                "(`)\1{2,}[^`]*(`)\1{2,}|`[^`]*`", "[code]", stripped_line
+            )
+            matches = tool.check(code_substituted_line)
             report.extend(matches)
 
     is_correctly_spelled = lambda rule: rule.ruleIssueType == "misspelling" and (

@@ -493,7 +493,7 @@ def check_grammar(notebook):
         code_block = False
         for line in cell:
             stripped_line = line.rstrip().strip(" #*")
-            if stripped_line in ("```python", "```"):
+            if stripped_line in ("```python", "```bash", "```"):
                 code_block = not code_block
             if code_block:
                 continue

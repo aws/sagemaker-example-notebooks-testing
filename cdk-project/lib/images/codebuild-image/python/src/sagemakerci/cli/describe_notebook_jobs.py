@@ -80,7 +80,7 @@ def main():
             ).total_seconds()
             status = response.get("ProcessingJobStatus")
             error = response.get("ExitMessage")
-            date = response.get("ProcessingEndTime", datetime.now()).date.strftime("%Y-%m-%d")
+            date = response.get("ProcessingEndTime", datetime.now()).strftime("%Y-%m-%d")
 
         output_notebooks.append(uri)
         runtimes.append(runtime)

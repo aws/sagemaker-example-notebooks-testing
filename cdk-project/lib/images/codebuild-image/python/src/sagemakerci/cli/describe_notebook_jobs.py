@@ -64,15 +64,13 @@ def main():
     sagemaker = session.client("sagemaker")
     for index, row in df.iterrows():
         job_name = row["processing-job-name"]
-
-        response = sagemaker.describe_processing_job(ProcessingJobName=job_name)
-
         if job_name == "None":
             uri = "None"
             runtime = 0
             status = "Skipped"
             error = "This notebook was skipped because it either uses Docker or Local Mode."
         else:
+            response = sagemaker.describe_processing_job(ProcessingJobName=job_name)
             notebook, uri = get_output_notebook(job_name, session)
             runtime = (
                 response.get("ProcessingEndTime", datetime.now())

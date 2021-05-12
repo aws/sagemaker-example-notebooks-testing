@@ -221,7 +221,8 @@ def main():
                 print("*")
                 if status != "Completed":
                     print(failure_reason)
-                    failures[notebook] = failure_reason
+                    if status != "Skipped":
+                        failures[notebook] = failure_reason
                 jobs.pop(notebook)
             time.sleep(10)
 

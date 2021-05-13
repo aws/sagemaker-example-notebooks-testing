@@ -151,6 +151,7 @@ allow_list = {
     ".NET",
     "Boto3",
     "boto3",
+    "boto",
     "Python",
     "Textract",
     "Timestream",
@@ -454,7 +455,9 @@ allow_list = {
     "jsonl",
     "json",
     "JSON",
-    "explainability",
+    "Explainability",
+    "libsvm",
+    "protobuf",
 }
 
 rules_to_ignore = {

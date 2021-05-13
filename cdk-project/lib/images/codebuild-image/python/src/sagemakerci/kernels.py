@@ -3,6 +3,16 @@ from sagemakerci import parse_notebook
 
 
 def get_latest_image_digest(registry, repository):
+    """Get the latest Docker image digest for a given registry ID and ECR repository.
+
+    Args:
+        registry (str): The account ID that contains the ECR repository with the relevant image.
+        repository (str): The name of the ECR repository for the image.
+
+    Returns:
+        str: The latest image digest.
+
+    """
     client = boto3.client("ecr")
     response = client.describe_images(
         registryId=registry,
@@ -26,6 +36,15 @@ SPARK_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/spark@{get_late
 
 
 def kernel_type_for(notebook):
+    """Classify the general kernel type for a given notebook using the kernel information in the metadata.
+
+    Args:
+        notebook (Path): The path to the notebook for which to determine the kernel type.
+
+    Returns:
+        str: The kernel type (eg. "MXNet", "PyTorch", "TensorFlow 1", "TensorFlow 2", "Spark", or "Data Science")
+
+    """
     kernel_name = parse_notebook.kernel_for(notebook)
 
     if kernel_name:
@@ -58,6 +77,15 @@ def kernel_type_for(notebook):
 
 
 def kernel_image_for(notebook):
+    """Get the ECR URI for the kernel image to be used to run a given notebook.
+
+    Args:
+        notebook (Path): The path to the notebook for which to select the kernel image URI.
+
+    Returns:
+        str: The ECR image URI for the kernel to be used to run the notebook.
+
+    """
     kernel_type = kernel_type_for(notebook)
 
     if kernel_type == "MXNet":

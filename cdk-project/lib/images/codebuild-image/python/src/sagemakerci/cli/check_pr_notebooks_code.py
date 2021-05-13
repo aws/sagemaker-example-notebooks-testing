@@ -22,6 +22,16 @@ def parse_args(args):
 
 
 def check_code_format(notebook):
+    """Run black-nb against the given notebook.
+
+    Args:
+        notebook (str): The notebook filename to run the formatting check against.
+
+    Returns:
+        (bool, black_nb.SubReport): A boolean indicating whether the code would be reformatted
+            and the corresponding report.
+
+    """
     write_back = black.WriteBack.CHECK
     mode = black.Mode(
         target_versions=TARGET_VERSIONS,

@@ -3,8 +3,7 @@ import argparse
 import os
 import sys
 
-from sagemakerci import linting
-from sagemakerci.cli.run_pr_notebooks import notebook_filenames
+from sagemakerci import linting, parse_notebook
 
 
 def parse_args(args):
@@ -24,7 +23,7 @@ def main():
 
     failures = {}
 
-    for notebook in notebook_filenames(args.pr):
+    for notebook in parse_notebook.pr_notebook_filenames(args.pr):
         report = linting.check_grammar(notebook)
         if report:
             failures[notebook] = report

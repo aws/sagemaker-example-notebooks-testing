@@ -4,9 +4,7 @@ import os
 import sys
 import time
 
-from github import Github
 from sagemakerci import kernels, parse_notebook
-from sagemakerci.git import Git
 from sagemakerci.run_notebook import (
     ensure_session,
     execute_notebook,
@@ -37,13 +35,6 @@ def parse_args(args):
     return parsed
 
 
-def notebook_filenames(pr_num):
-    g = Github(Git().oauth_token)
-    repo = g.get_repo("aws/amazon-sagemaker-examples")
-    pr = repo.get_pull(pr_num)
-    return filter(parse_notebook.is_notebook, [file.filename for file in pr.get_files()])
-
-
 def main():
     args = parse_args(sys.argv[1:])
 
@@ -51,7 +42,7 @@ def main():
 
     session = ensure_session()
     instance_type = args.instance or "ml.m5.xlarge"
-    for notebook in notebook_filenames(args.pr):
+    for notebook in parse_notebook.pr_notebook_filenames(args.pr):
         if args.skip_docker and parse_notebook.contains_code(
             notebook, ["docker ", 'instance_type = "local"']
         ):

@@ -4,7 +4,6 @@ import os
 import sys
 import time
 from datetime import datetime
-from pathlib import Path
 
 import pandas as pd
 from sagemakerci.run_notebook import (
@@ -25,10 +24,6 @@ def parse_args(args):
     parsed = parser.parse_args(args)
 
     return parsed
-
-
-def notebook_filenames():
-    return list(Path(".").rglob("*.ipynb"))
 
 
 def save_csv_to_s3(df, csv_name):

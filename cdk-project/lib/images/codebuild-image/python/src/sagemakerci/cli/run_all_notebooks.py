@@ -3,7 +3,6 @@ import argparse
 import os
 import sys
 import time
-from pathlib import Path
 
 import pandas as pd
 from sagemakerci import kernels, parse_notebook
@@ -33,10 +32,6 @@ def parse_args(args):
     return parsed
 
 
-def notebook_filenames():
-    return [str(filename) for filename in Path(".").rglob("*.ipynb")]
-
-
 def save_csv_to_s3(notebooks, job_names, kernels):
     session = ensure_session()
 
@@ -61,7 +56,7 @@ def save_csv_to_s3(notebooks, job_names, kernels):
 def main():
     args = parse_args(sys.argv[1:])
 
-    notebooks = notebook_filenames()
+    notebooks = parse_notebook.all_notebook_filenames()
     job_names = []
     kernel_names = []
 

@@ -1,7 +1,20 @@
 import json
 import os
+from pathlib import Path
 
-from sagemakerci.run_notebook import ensure_session
+from github import Github
+from sagemakerci.git import Git
+
+
+def all_notebook_filenames():
+    return [str(filename) for filename in Path(".").rglob("*.ipynb")]
+
+
+def pr_notebook_filenames(pr_num):
+    g = Github(Git().oauth_token)
+    repo = g.get_repo("aws/amazon-sagemaker-examples")
+    pr = repo.get_pull(pr_num)
+    return filter(is_notebook, [file.filename for file in pr.get_files()])
 
 
 def is_notebook(filename):

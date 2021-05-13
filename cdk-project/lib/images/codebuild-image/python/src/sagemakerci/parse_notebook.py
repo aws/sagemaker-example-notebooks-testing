@@ -7,10 +7,25 @@ from sagemakerci.git import Git
 
 
 def all_notebook_filenames():
+    """Return all the notebook filenames in the current directory.
+
+    Returns:
+        [str]: A list of strings containing paths to notebooks in the current directory.
+
+    """
     return [str(filename) for filename in Path(".").rglob("*.ipynb")]
 
 
 def pr_notebook_filenames(pr_num):
+    """Return all the notebook filenames in a given GitHub pull request.
+
+    Args:
+        pr_num: The pull request number.
+
+    Returns:
+        [str]: A list of strings containing paths to notebooks in the PR.
+
+    """
     g = Github(Git().oauth_token)
     repo = g.get_repo("aws/amazon-sagemaker-examples")
     pr = repo.get_pull(pr_num)
@@ -18,13 +33,30 @@ def pr_notebook_filenames(pr_num):
 
 
 def is_notebook(filename):
+    """Check whether a given file is a Jupyter notebook.
+
+    Args:
+        filename: The file to check.
+
+    Returns:
+        bool: Whether the given file is a Jupyter notebook.
+
+    """
     root, ext = os.path.splitext(filename)
     if ext == ".ipynb":
         return os.path.exists(filename)
 
 
 def kernel_for(notebook):
-    """Read the notebook and extract the kernel name, if any"""
+    """Parses the kernel metadata and returns the kernel display name.
+
+    Args:
+        notebook (Path): The path to the notebook for which to get the kernel.
+
+    Returns:
+        str: The kernel display name, if it exists.
+
+    """
     with open(notebook, "r") as f:
         nb = json.load(f)
 
@@ -37,6 +69,15 @@ def kernel_for(notebook):
 
 
 def code_cells(notebook):
+    """Get a list of all the code cells in a given notebook.
+
+    Args:
+        notebook (Path): The notebook to get the code cells from.
+
+    Returns:
+        [[str]]: A list of code cells. Each code cell is a list of lines of code.
+
+    """
     with open(notebook) as notebook_file:
         cells = json.load(notebook_file)["cells"]
     code_cells = []
@@ -47,6 +88,16 @@ def code_cells(notebook):
 
 
 def contains_code(notebook, snippets):
+    """Check whether a notebook contains any of a list of code snippets in any of its code cells.
+
+    Args:
+        notebook (Path): The notebook to check for code snippets.
+        snippets ([str]): The list of code snippet strings to check for.
+
+    Returns:
+        bool: Whether any of the code snippets exist in the notebook's code cells.
+
+    """
     cells = code_cells(notebook)
 
     for cell in cells:
@@ -58,6 +109,15 @@ def contains_code(notebook, snippets):
 
 
 def markdown_cells(notebook):
+    """Get a list of all the Markdown cells in a given notebook.
+
+    Args:
+        notebook (Path): The notebook to get the Markdown cells from.
+
+    Returns:
+        [[str]]: A list of Markdown cells. Each code cell is a list of lines of text.
+
+    """
     with open(notebook) as notebook_file:
         cells = json.load(notebook_file)["cells"]
     md_cells = []

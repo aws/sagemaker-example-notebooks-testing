@@ -34,6 +34,16 @@ abbrev_image_pat = re.compile(
 
 
 def describe(job_name, session):
+    """Get the status and exit message for a Processing job.
+
+    Args:
+        job_name (str):
+        session:
+
+    Returns:
+        (str, str): A tuple with the status and the exit message.
+
+    """
     session = ensure_session(session)
     client = session.client("sagemaker")
     response = client.describe_processing_job(ProcessingJobName=job_name)
@@ -41,6 +51,16 @@ def describe(job_name, session):
 
 
 def is_running(job_name, session):
+    """Check whether a Processing job is still running.
+
+    Args:
+        job_name (str):
+        session:
+
+    Returns:
+        bool: Whether the Processing job is running.
+
+    """
     if not job_name:
         return False
     status, failure_reason = describe(job_name, session)
@@ -120,12 +140,12 @@ def upload_fileobj(notebook_fileobj, session=None):
     """
 
     session = ensure_session(session)
-    snotebook = "notebook-{}.ipynb".format(time.strftime("%Y-%m-%d-%H-%M-%S", time.gmtime()))
+    snotebook = f"notebook-{time.strftime('%Y-%m-%d-%H-%M-%S', time.gmtime())}.ipynb"
 
     s3 = session.client("s3")
     key = "papermill_input/" + snotebook
     bucket = default_bucket(session)
-    s3path = "s3://{}/{}".format(bucket, key)
+    s3path = f"s3://{bucket}/{key}"
     s3.upload_fileobj(notebook_fileobj, bucket, key)
 
     return s3path
@@ -133,7 +153,7 @@ def upload_fileobj(notebook_fileobj, session=None):
 
 def get_output_prefix():
     """Returns an S3 prefix in the Python SDK default bucket."""
-    return "s3://{}/papermill_output".format(default_bucket())
+    return f"s3://{default_bucket()}/papermill_output"
 
 
 def execute_notebook(
@@ -153,12 +173,12 @@ def execute_notebook(
         role = get_execution_role(session)
     elif "/" not in role:
         account = session.client("sts").get_caller_identity()["Account"]
-        role = "arn:aws:iam::{}:role/{}".format(account, role)
+        role = f"arn:aws:iam::{account}:role/{role}"
 
     if "/" not in image:
         account = session.client("sts").get_caller_identity()["Account"]
         region = session.region_name
-        image = "{}.dkr.ecr.{}.amazonaws.com/{}:latest".format(account, region, image)
+        image = f"{account}.dkr.ecr.{region}.amazonaws.com/{image}:latest"
 
     if notebook == None:
         notebook = input_path
@@ -174,7 +194,7 @@ def execute_notebook(
     )
     input_directory = "/opt/ml/processing/input/"
     local_input = os.path.join(input_directory, os.path.basename(notebook))
-    result = "{}-{}{}".format(nb_name, timestamp, nb_ext)
+    result = f"{nb_name}-{timestamp}{nb_ext}"
     local_output = "/opt/ml/processing/output/"
 
     api_args = {
@@ -286,7 +306,7 @@ def get_output_notebook(job_name, session=None):
 
     prefix = desc["ProcessingOutputConfig"]["Outputs"][0]["S3Output"]["S3Uri"]
     notebook = os.path.basename(desc["Environment"]["PAPERMILL_OUTPUT"])
-    return notebook, "{}/{}".format(prefix, notebook)
+    return notebook, f"{prefix}/{notebook}"
 
 
 def download_notebook(job_name, output=".", session=None):
@@ -310,9 +330,9 @@ def download_notebook(job_name, output=".", session=None):
             if e.errno != errno.EEXIST:
                 raise
 
-    p1 = Popen(split("aws s3 cp --no-progress {} {}/".format(s3path, output)))
+    p1 = Popen(split(f"aws s3 cp --no-progress {s3path} {output}/"))
     p1.wait()
-    return "{}/{}".format(output.rstrip("/"), notebook)
+    return f"{output.rstrip('/')}/{notebook}"
 
 
 def run_notebook(
@@ -356,7 +376,7 @@ def run_notebook(
         instance_type=instance_type,
         session=session,
     )
-    print("Job {} started".format(job_name))
+    print(f"Job {job_name} started")
     status, failure_reason = wait_for_complete(job_name)
     if status == "Completed":
         local = download_notebook(job_name, output=output)
@@ -452,7 +472,7 @@ def describe_run(job_name, session=None):
     if status == "Completed":
         output_prefix = desc["ProcessingOutputConfig"]["Outputs"][0]["S3Output"]["S3Uri"]
         notebook_name = os.path.basename(desc["Environment"]["PAPERMILL_OUTPUT"])
-        result = "{}/{}".format(output_prefix, notebook_name)
+        result = f"{output_prefix}/{notebook_name}"
     else:
         result = None
 
@@ -663,13 +683,13 @@ def create_lambda(role=None, session=None):
 
     if "/" not in role:
         account = session.client("sts").get_caller_identity()["Account"]
-        role = "arn:aws:iam::{}:role/{}".format(account, role)
+        role = f"arn:aws:iam::{account}:role/{role}"
 
     code_bytes = zip_bytes(code_file)
 
     client = session.client("lambda")
 
-    print("Role={}".format(role))
+    print(f"Role={role}")
     retries = 0
     while True:
         try:
@@ -746,7 +766,7 @@ def zip_bytes(*files):
     zip_io = io.BytesIO()
     with zip.ZipFile(zip_io, "w") as z:
         for cf in files:
-            with open("{}/{}".format(file_dir, cf), "rb") as f:
+            with open(f"{file_dir}/{cf}", "rb") as f:
                 code_bytes = f.read()
             info = zip.ZipInfo(cf)
             info.external_attr = 0o777 << 16  # give full access to included file
@@ -812,17 +832,17 @@ def invoke(
     if "/" not in image:
         account = session.client("sts").get_caller_identity()["Account"]
         region = session.region_name
-        image = "{}.dkr.ecr.{}.amazonaws.com/{}:latest".format(account, region, image)
+        image = f"{account}.dkr.ecr.{region}.amazonaws.com/{image}:latest"
 
     if not role:
         try:
             role = get_execution_role(session)
         except ValueError:
-            role = "BasicExecuteNotebookRole-{}".format(session.region_name)
+            role = f"BasicExecuteNotebookRole-{session.region_name}"
 
     if "/" not in role:
         account = session.client("sts").get_caller_identity()["Account"]
-        role = "arn:aws:iam::{}:role/{}".format(account, role)
+        role = f"arn:aws:iam::{account}:role/{role}"
 
     if input_path is None:
         input_path = upload_notebook(notebook)
@@ -937,17 +957,17 @@ def schedule(
     if "/" not in image:
         account = session.client("sts").get_caller_identity()["Account"]
         region = session.region_name
-        image = "{}.dkr.ecr.{}.amazonaws.com/{}:latest".format(account, region, image)
+        image = f"{account}.dkr.ecr.{region}.amazonaws.com/{image}:latest"
 
     if not role:
         try:
             role = get_execution_role(session)
         except ValueError:
-            role = "BasicExecuteNotebookRole-{}".format(session.region_name)
+            role = f"BasicExecuteNotebookRole-{session.region_name}"
 
     if "/" not in role:
         account = session.client("sts").get_caller_identity()["Account"]
-        role = "arn:aws:iam::{}:role/{}".format(account, role)
+        role = f"arn:aws:iam::{account}:role/{role}"
 
     if input_path is None:
         input_path = upload_notebook(notebook)
@@ -974,7 +994,7 @@ def schedule(
 
     result = events.put_rule(
         Name=prefixed_rule_name,
-        Description='Rule to run the Jupyter notebook "{}"'.format(notebook),
+        Description=f'Rule to run the Jupyter notebook "{notebook}"',
         **kwargs,
     )
 
@@ -982,7 +1002,7 @@ def schedule(
 
     lambda_ = session.client("lambda")
     lambda_.add_permission(
-        StatementId="EB-{}".format(rule_name),
+        StatementId=f"EB-{rule_name}",
         Action="lambda:InvokeFunction",
         FunctionName="RunNotebook",
         Principal="events.amazonaws.com",
@@ -991,7 +1011,7 @@ def schedule(
 
     account = session.client("sts").get_caller_identity()["Account"]
     region = session.region_name
-    target_arn = "arn:aws:lambda:{}:{}:function:{}".format(region, account, lambda_function_name)
+    target_arn = f"arn:aws:lambda:{region}:{account}:function:{lambda_function_name}"
 
     result = events.put_targets(
         Rule=prefixed_rule_name,
@@ -1013,7 +1033,7 @@ def unschedule(rule_name, session=None):
     lambda_ = session.client("lambda")
 
     try:
-        lambda_.remove_permission(FunctionName="RunNotebook", StatementId="EB-{}".format(rule_name))
+        lambda_.remove_permission(FunctionName="RunNotebook", StatementId=f"EB-{rule_name}")
     except botocore.exceptions.ClientError as ce:
         message = ce.response.get("Error", {}).get("Message", "Unknown error")
         if not "is not found" in message:  # ignore it if the permission was already deleted

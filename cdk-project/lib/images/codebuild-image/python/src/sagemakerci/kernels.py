@@ -1,0 +1,74 @@
+import boto3
+from sagemakerci import parse_notebook
+
+
+def get_latest_image_digest(registry, repository):
+    client = boto3.client("ecr")
+    response = client.describe_images(
+        registryId=registry,
+        repositoryName=repository,
+        maxResults=1000,
+    )
+    images = response["imageDetails"]
+    return sorted(images, key=lambda image: image["imagePushedAt"], reverse=True)[0]["imageDigest"]
+
+
+CI_REGISTRY_ID = "521695447989"
+LL_REGISTRY_ID = "236514542706"
+
+BASE_PYTHON_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/base-python@{get_latest_image_digest(CI_REGISTRY_ID, 'base-python')}"
+DATA_SCIENCE_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/data-science@{get_latest_image_digest(CI_REGISTRY_ID, 'data-science')}"
+MXNET_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/mxnet@{get_latest_image_digest(CI_REGISTRY_ID, 'mxnet')}"
+PYTORCH_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/pytorch@{get_latest_image_digest(CI_REGISTRY_ID, 'pytorch')}"
+TENSORFLOW_1_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/tensorflow-1@{get_latest_image_digest(CI_REGISTRY_ID, 'tensorflow-1')}"
+TENSORFLOW_2_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/tensorflow-2@{get_latest_image_digest(CI_REGISTRY_ID, 'tensorflow-2')}"
+SPARK_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/spark@{get_latest_image_digest(CI_REGISTRY_ID, 'spark')}"
+
+
+def kernel_type_for(notebook):
+    kernel_name = parse_notebook.kernel_for(notebook)
+
+    if kernel_name:
+        if any(
+            name in kernel_name
+            for name in ("MXNet", "conda_mxnet_latest_p37", "conda_mxnet_p27", "conda_mxnet_p36")
+        ):
+            return "MXNet"
+        elif any(
+            name in kernel_name
+            for name in (
+                "PyTorch",
+                "conda_pytorch_latest_p36",
+                "conda_pytorch_p27",
+                "conda_pytorch_p36",
+            )
+        ):
+            return "PyTorch"
+        elif any(
+            name in kernel_name
+            for name in ("TensorFlow 1", "conda_tensorflow_p27", "conda_tensorflow_p36")
+        ):
+            return "TensorFlow 1"
+        elif any(name in kernel_name for name in ("TensorFlow 2", "conda_tensorflow2_p36")):
+            return "TensorFlow 2"
+        elif any(name in kernel_name for name in ("SparkMagic", "PySpark", "pysparkkernel")):
+            return "Spark"
+
+    return "Data Science"
+
+
+def kernel_image_for(notebook):
+    kernel_type = kernel_type_for(notebook)
+
+    if kernel_type == "MXNet":
+        return MXNET_IMAGE
+    elif kernel_type == "PyTorch":
+        return PYTORCH_IMAGE
+    elif kernel_type == "TensorFlow 1":
+        return TENSORFLOW_1_IMAGE
+    elif kernel_type == "TensorFlow 2":
+        return TENSORFLOW_2_IMAGE
+    elif kernel_type == "Spark":
+        return SPARK_IMAGE
+
+    return DATA_SCIENCE_IMAGE

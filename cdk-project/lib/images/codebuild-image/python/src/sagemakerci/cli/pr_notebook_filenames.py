@@ -3,9 +3,7 @@ import argparse
 import os
 import sys
 
-from github import Github
 from sagemakerci import parse_notebook
-from sagemakerci.git import Git
 
 
 def parse_args(args):

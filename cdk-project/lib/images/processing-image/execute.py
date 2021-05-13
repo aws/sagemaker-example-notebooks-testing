@@ -15,8 +15,8 @@
 
 from __future__ import print_function
 
-import os
 import json
+import os
 import sys
 import traceback
 from urllib.parse import urlparse
@@ -24,9 +24,7 @@ from urllib.request import urlopen
 
 import boto3
 import botocore
-
 import jupyter_client.kernelspec as kernelspec
-
 import papermill
 
 input_var = "PAPERMILL_INPUT"

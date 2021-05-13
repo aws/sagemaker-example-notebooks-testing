@@ -3,22 +3,15 @@ import argparse
 import os
 import sys
 import time
-
 from pathlib import Path
 
 import pandas as pd
-
+from sagemakerci import kernels, parse_notebook
 from sagemakerci.run_notebook import (
     ensure_session,
+    execute_notebook,
     get_output_prefix,
     upload_notebook,
-    execute_notebook,
-)
-from sagemakerci.cli.run_pr_notebooks import (
-    is_notebook,
-    kernel_image_for,
-    kernel_type_for,
-    contains_code,
 )
 from sagemakerci.utils import default_bucket
 
@@ -70,15 +63,17 @@ def main():
 
     notebooks = notebook_filenames()
     job_names = []
-    kernels = []
+    kernel_names = []
 
     session = ensure_session()
     instance_type = args.instance or "ml.m5.xlarge"
     for notebook in notebooks:
-        if args.skip_docker and contains_code(notebook, ["docker ", 'instance_type = "local"']):
+        if args.skip_docker and parse_notebook.contains_code(
+            notebook, ["docker ", 'instance_type = "local"']
+        ):
             job_name = None
         else:
-            image = kernel_image_for(notebook)
+            image = kernels.kernel_image_for(notebook)
             s3path = upload_notebook(notebook, session)
             job_name = execute_notebook(
                 image=image,
@@ -93,12 +88,12 @@ def main():
 
         print(job_name)
         job_names.append(str(job_name))
-        kernels.append(kernel_type_for(notebook))
+        kernel_names.append(kernels.kernel_type_for(notebook))
 
     print("\n" * 2)
     print("-" * 100)
     print("\n" * 2)
-    print(save_csv_to_s3(notebooks, job_names, kernels))
+    print(save_csv_to_s3(notebooks, job_names, kernel_names))
 
 
 if __name__ == "__main__":

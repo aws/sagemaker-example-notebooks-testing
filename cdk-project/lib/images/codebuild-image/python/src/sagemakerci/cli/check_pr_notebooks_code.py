@@ -3,9 +3,7 @@ import argparse
 import os
 import sys
 
-import black
-from black_nb.cli import format_file_in_place, SubReport, TARGET_VERSIONS
-
+from sagemakerci import linting
 from sagemakerci.cli.run_pr_notebooks import notebook_filenames
 
 
@@ -21,44 +19,13 @@ def parse_args(args):
     return parsed
 
 
-def check_code_format(notebook):
-    """Run black-nb against the given notebook.
-
-    Args:
-        notebook (str): The notebook filename to run the formatting check against.
-
-    Returns:
-        (bool, black_nb.SubReport): A boolean indicating whether the code would be reformatted
-            and the corresponding report.
-
-    """
-    write_back = black.WriteBack.CHECK
-    mode = black.Mode(
-        target_versions=TARGET_VERSIONS,
-        line_length=100,
-        is_pyi=False,
-        string_normalization=True,
-    )
-    report = format_file_in_place(
-        src=notebook,
-        write_back=write_back,
-        mode=mode,
-        clear_output=False,
-        sub_report=SubReport(write_back=write_back),
-    )
-    print(str(report))
-    if (report.change_count > 0) or (report.failure_count > 0):
-        return True, report
-    return False, report
-
-
 def main():
     args = parse_args(sys.argv[1:])
 
     failures = {}
 
     for notebook in notebook_filenames(args.pr):
-        failed, report = check_code_format(notebook)
+        failed, report = linting.check_code_format(notebook)
         if failed:
             failures[notebook] = report
             basename = os.path.basename(notebook)

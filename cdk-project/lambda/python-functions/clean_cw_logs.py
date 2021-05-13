@@ -3,7 +3,6 @@ import os
 import time
 
 import boto3
-
 import common
 
 logger = common.get_logger()

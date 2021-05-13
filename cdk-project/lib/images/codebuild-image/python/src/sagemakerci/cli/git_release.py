@@ -6,12 +6,11 @@ import os
 import shutil
 import sys
 
-import sagemakerci.common
-import sagemakerci.codestar as cs
 import sagemakerci.changelog
+import sagemakerci.codestar as cs
+import sagemakerci.common
 import sagemakerci.git
 import sagemakerci.version
-
 
 logging.basicConfig(level=logging.INFO)
 logging.getLogger("boto3").setLevel(logging.ERROR)

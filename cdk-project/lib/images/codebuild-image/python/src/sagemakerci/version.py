@@ -1,6 +1,5 @@
 import re
 
-
 # a subset of PEP 440
 _VERSION_REGEX = re.compile(
     r"""

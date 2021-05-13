@@ -15,23 +15,38 @@
 import asyncio
 import errno
 import io
-import logging
 import json
+import logging
 import os
 import re
 import time
-from subprocess import Popen, PIPE, STDOUT, DEVNULL
-from shlex import split
 import zipfile as zip
+from shlex import split
+from subprocess import Popen
 
-import botocore
 import boto3
-
+import botocore
 from sagemakerci.utils import default_bucket, get_execution_role
 
 abbrev_image_pat = re.compile(
     r"(?P<account>\d+).dkr.ecr.(?P<region>[^.]+).amazonaws.com/(?P<image>[^:/]+)(?P<tag>:[^:]+)?"
 )
+
+
+def describe(job_name, session):
+    session = ensure_session(session)
+    client = session.client("sagemaker")
+    response = client.describe_processing_job(ProcessingJobName=job_name)
+    return response["ProcessingJobStatus"], response.get("ExitMessage")
+
+
+def is_running(job_name, session):
+    if not job_name:
+        return False
+    status, failure_reason = describe(job_name, session)
+    if status in ("InProgress", "Stopping"):
+        return True
+    return False
 
 
 def abbreviate_image(image):

@@ -3,18 +3,16 @@ import argparse
 import os
 import sys
 import time
-
 from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
-
 from sagemakerci.run_notebook import (
     ensure_session,
-    get_output_prefix,
-    upload_notebook,
     execute_notebook,
     get_output_notebook,
+    get_output_prefix,
+    upload_notebook,
 )
 from sagemakerci.utils import default_bucket
 

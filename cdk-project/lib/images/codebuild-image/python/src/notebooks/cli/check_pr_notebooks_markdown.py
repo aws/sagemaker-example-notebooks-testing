@@ -3,7 +3,7 @@ import argparse
 import os
 import sys
 
-from sagemakerci import linting, parse_notebook
+from notebooks import lint, parse
 
 
 def parse_args(args):
@@ -23,24 +23,22 @@ def main():
 
     failures = {}
 
-    for notebook in parse_notebook.pr_notebook_filenames(args.pr):
-        failed, report = linting.check_code_format(notebook)
-        if failed:
+    for notebook in parse.pr_notebook_filenames(args.pr):
+        report = lint.check_grammar(notebook)
+        if report:
             failures[notebook] = report
             basename = os.path.basename(notebook)
             print("\n" * 2)
             print(f"* {basename} " + "*" * (97 - len(basename)))
-            print("*")
-            print(f"* {'report':>11}: {str(report):<11}")
-            print("*")
+            print()
+            print("\n\n".join([str(match) for match in report]))
 
     print("\n" * 2)
     print("-" * 100)
     if len(failures) > 0:
         raise Exception(
-            "One or more notebooks did not pass the code formatting check. Please see above for error messages. "
-            "To reformat the code in your notebook, use black-nb: https://pypi.org/project/black-nb/ "
-            "Run the command `black-nb -l 100 your_notebook_file.ipynb`"
+            "One or more notebooks did not pass the spelling and grammar check. Please see above for error messages. "
+            "To fix the text in your notebook, use language_tool_python.utils.correct: https://pypi.org/project/language-tool-python/"
         )
 
 

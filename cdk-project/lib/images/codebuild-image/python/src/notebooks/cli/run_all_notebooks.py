@@ -5,14 +5,14 @@ import sys
 import time
 
 import pandas as pd
-from sagemakerci import kernels, parse_notebook
-from sagemakerci.run_notebook import (
+from notebooks import kernels, parse
+from notebooks.run import (
     ensure_session,
     execute_notebook,
     get_output_prefix,
     upload_notebook,
 )
-from sagemakerci.utils import default_bucket
+from notebooks.utils import default_bucket
 
 
 def parse_args(args):
@@ -56,14 +56,14 @@ def save_csv_to_s3(notebooks, job_names, kernels):
 def main():
     args = parse_args(sys.argv[1:])
 
-    notebooks = parse_notebook.all_notebook_filenames()
+    notebooks = parse.all_notebook_filenames()
     job_names = []
     kernel_names = []
 
     session = ensure_session()
     instance_type = args.instance or "ml.m5.xlarge"
     for notebook in notebooks:
-        if args.skip_docker and parse_notebook.contains_code(
+        if args.skip_docker and parse.contains_code(
             notebook, ["docker ", 'instance_type = "local"']
         ):
             job_name = None

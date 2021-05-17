@@ -4,8 +4,8 @@ import os
 import sys
 import time
 
-from sagemakerci import kernels, parse_notebook
-from sagemakerci.run_notebook import (
+from notebooks import kernels, parse
+from notebooks.run import (
     ensure_session,
     execute_notebook,
     get_output_prefix,
@@ -42,8 +42,8 @@ def main():
 
     session = ensure_session()
     instance_type = args.instance or "ml.m5.xlarge"
-    for notebook in parse_notebook.pr_notebook_filenames(args.pr):
-        if args.skip_docker and parse_notebook.contains_code(
+    for notebook in parse.pr_notebook_filenames(args.pr):
+        if args.skip_docker and parse.contains_code(
             notebook, ["docker ", 'instance_type = "local"']
         ):
             job_name = None

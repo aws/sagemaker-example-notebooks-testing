@@ -60,18 +60,18 @@ class Git:
 
     def add(self, path):
         cmd = f"git add {path}".split()
-        sagemakerci.common.check_call_quiet(cmd)
+        notebooks.common.check_call_quiet(cmd)
 
     def commit(self, message):
-        sagemakerci.common.check_call_quiet(
+        notebooks.common.check_call_quiet(
             ["git", "-c", "user.name=ci", "-c", "user.email=ci", "commit", "-m", message]
         )
 
     def tag(self, tag):
-        sagemakerci.common.check_call_quiet(f"git tag {tag}".split())
+        notebooks.common.check_call_quiet(f"git tag {tag}".split())
 
     def _revcount(self, ref="HEAD"):
-        return int(sagemakerci.common.check_output_noerr(f"git rev-list {ref} --count".split()))
+        return int(notebooks.common.check_output_noerr(f"git rev-list {ref} --count".split()))
 
     def find_version_tag(self):
         depth = 1
@@ -80,7 +80,7 @@ class Git:
         # try up to 1024 commits
         for _ in range(0, 10):
             try:
-                return sagemakerci.common.check_output_capture_error(cmd)
+                return notebooks.common.check_output_capture_error(cmd)
             except subprocess.CalledProcessError as e:
                 if self._revcount() < depth:
                     # no more commits
@@ -88,7 +88,7 @@ class Git:
 
                 if "No tags" in e.stdout or "No names found" in e.stdout:
                     depth = depth * 2
-                    sagemakerci.common.check_call_quiet(f"git fetch --depth {depth}".split())
+                    notebooks.common.check_call_quiet(f"git fetch --depth {depth}".split())
                 else:
                     raise
 
@@ -99,16 +99,16 @@ class Git:
         if since_tag:
             cmd.append(f"{since_tag}..HEAD")
 
-        commits = sagemakerci.common.check_output_noerr(cmd)
+        commits = notebooks.common.check_output_noerr(cmd)
         return commits.split("\n") if commits else []
 
     def _current_branch(self):
         cmd = "git branch --format %(refname:short)".split()
-        return sagemakerci.common.check_output_noerr(cmd)
+        return notebooks.common.check_output_noerr(cmd)
 
     def _origin_details(self):
         cmd = "git remote get-url --all origin".split()
-        remote = sagemakerci.common.check_output_noerr(cmd)
+        remote = notebooks.common.check_output_noerr(cmd)
 
         match = Git._REMOTE_PARSE_REGEX.search(remote)
         owner = match.group("owner")
@@ -168,8 +168,8 @@ class Git:
         if protected:
             self._remove_branch_protection()
 
-        sagemakerci.common.check_call_quiet("git push".split())
-        sagemakerci.common.check_call_quiet(f"git push origin {tag}".split())
+        notebooks.common.check_call_quiet("git push".split())
+        notebooks.common.check_call_quiet(f"git push origin {tag}".split())
 
         if protected:
             self._enable_branch_protection()
@@ -192,11 +192,11 @@ class Git:
         self, owner, repo, branch, expected_rev, depth=1
     ):  # pylint: disable=too-many-arguments
         uri = f"https://{self.oauth_token}@github.com/{owner}/{repo}.git"
-        sagemakerci.common.check_call_quiet(
+        notebooks.common.check_call_quiet(
             f"git clone --depth {depth} --single-branch --branch {branch} {uri} .".split()
         )
 
-        rev = sagemakerci.common.check_output_noerr("git rev-parse --verify HEAD".split())
+        rev = notebooks.common.check_output_noerr("git rev-parse --verify HEAD".split())
 
         # make sure we fetched the version we expected
         if rev != expected_rev:

@@ -6,14 +6,14 @@ import time
 from datetime import datetime
 
 import pandas as pd
-from sagemakerci.run_notebook import (
+from notebooks.run import (
     ensure_session,
     execute_notebook,
     get_output_notebook,
     get_output_prefix,
     upload_notebook,
 )
-from sagemakerci.utils import default_bucket
+from notebooks.utils import default_bucket
 
 
 def parse_args(args):

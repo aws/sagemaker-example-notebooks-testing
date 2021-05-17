@@ -3,7 +3,7 @@ import re
 import black
 import language_tool_python
 from black_nb.cli import TARGET_VERSIONS, SubReport, format_file_in_place
-from sagemakerci import dictionary, parse_notebook
+from notebooks import dictionary, parse
 
 
 def check_grammar(notebook):
@@ -20,7 +20,7 @@ def check_grammar(notebook):
 
     report = []
 
-    cells = parse_notebook.markdown_cells(notebook)
+    cells = parse.markdown_cells(notebook)
     for cell in cells:
         code_block = False
         for line in cell:

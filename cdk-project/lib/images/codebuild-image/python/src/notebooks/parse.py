@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 
 from github import Github
-from sagemakerci.git import Git
+from notebooks.git import Git
 
 
 def all_notebook_filenames():

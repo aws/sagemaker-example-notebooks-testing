@@ -26,7 +26,7 @@ from subprocess import Popen
 
 import boto3
 import botocore
-from sagemakerci.utils import default_bucket, get_execution_role
+from notebooks.utils import default_bucket, get_execution_role
 
 abbrev_image_pat = re.compile(
     r"(?P<account>\d+).dkr.ecr.(?P<region>[^.]+).amazonaws.com/(?P<image>[^:/]+)(?P<tag>:[^:]+)?"

@@ -6,8 +6,8 @@ import time
 
 import notebooks
 import pandas as pd
-from notebooks.run import ensure_session, execute_notebook, get_output_prefix, upload_notebook
-from notebooks.utils import default_bucket
+from notebooks.run import execute_notebook, get_output_prefix, upload_notebook
+from notebooks.utils import default_bucket, ensure_session
 
 
 def parse_args(args):

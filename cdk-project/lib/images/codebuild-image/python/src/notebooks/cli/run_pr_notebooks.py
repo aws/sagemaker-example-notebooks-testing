@@ -6,13 +6,13 @@ import time
 
 import notebooks
 from notebooks.run import (
-    ensure_session,
     execute_notebook,
     get_output_prefix,
     is_running,
     upload_notebook,
     wait_for_complete,
 )
+from notebooks.utils import ensure_session
 
 
 def parse_args(args):

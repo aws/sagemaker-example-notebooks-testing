@@ -20,13 +20,12 @@ import logging
 import os
 import re
 import time
-import zipfile as zip
 from shlex import split
 from subprocess import Popen
 
 import boto3
 import botocore
-from notebooks.utils import default_bucket, get_execution_role
+from notebooks.utils import default_bucket, ensure_session, get_execution_role
 
 abbrev_image_pat = re.compile(
     r"(?P<account>\d+).dkr.ecr.(?P<region>[^.]+).amazonaws.com/(?P<image>[^:/]+)(?P<tag>:[^:]+)?"
@@ -657,10 +656,3 @@ def download_all(lis, output=".", session=None):
 
     session = ensure_session(session)
     return [download_notebook(job, output, session) for job in lis]
-
-
-def ensure_session(session=None):
-    """If session is None, create a default session and return it. Otherwise return the session passed in"""
-    if session is None:
-        session = boto3.session.Session()
-    return session

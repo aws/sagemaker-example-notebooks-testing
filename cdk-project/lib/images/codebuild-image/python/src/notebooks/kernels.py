@@ -1,5 +1,5 @@
 import boto3
-import notebooks
+from notebooks import parse
 
 
 def get_latest_image_digest(registry, repository):
@@ -45,7 +45,7 @@ def kernel_type_for(notebook):
         str: The kernel type (eg. "MXNet", "PyTorch", "TensorFlow 1", "TensorFlow 2", "Spark", or "Data Science")
 
     """
-    kernel_name = notebooks.parse.kernel_for(notebook)
+    kernel_name = parse.kernel_for(notebook)
 
     if kernel_name:
         if any(

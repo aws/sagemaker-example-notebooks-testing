@@ -3,7 +3,7 @@ import argparse
 import os
 import sys
 
-import notebooks
+from notebooks import parse
 
 
 def parse_args(args):
@@ -21,7 +21,7 @@ def parse_args(args):
 def main():
     args = parse_args(sys.argv[1:])
 
-    filenames = notebooks.parse.pr_notebook_filenames(args.pr)
+    filenames = parse.pr_notebook_filenames(args.pr)
     filenames_string = " ".join(filenames)
     print(filenames_string)  # This returns the string to bash scripts calling this python script
 

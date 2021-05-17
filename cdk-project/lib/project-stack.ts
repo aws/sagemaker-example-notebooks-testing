@@ -6,7 +6,6 @@ import cw = require("@aws-cdk/aws-cloudwatch");
 import events = require("@aws-cdk/aws-events");
 import targets = require("@aws-cdk/aws-events-targets");
 import iam = require("@aws-cdk/aws-iam");
-import lambda = require("@aws-cdk/aws-lambda");
 import s3 = require("@aws-cdk/aws-s3");
 import sam = require("@aws-cdk/aws-sam");
 import stepfunctions = require("@aws-cdk/aws-stepfunctions");
@@ -22,7 +21,6 @@ interface ProjectStackProps extends cdk.StackProps {
     project: common.Project;
     pullRequestBuildRole: iam.Role;
     releaseBuildRole: iam.Role;
-    startPipelineLambda: lambda.Function;
     artifactBucket: s3.Bucket;
 }
 
@@ -31,7 +29,6 @@ export class ProjectStack extends cdk.Stack {
     private readonly gitHubToken: cdk.SecretValue;
     private readonly pullRequestBuildRole: iam.IRole;
     private readonly releaseBuildRole: iam.IRole;
-    private readonly startPipelineLambda: lambda.IFunction;
     private readonly artifactBucket: s3.IBucket;
 
     static createProps(
@@ -43,7 +40,6 @@ export class ProjectStack extends cdk.Stack {
             project: project,
             pullRequestBuildRole: buildSystemStack.pullRequestBuildRole,
             releaseBuildRole: buildSystemStack.releaseBuildRole,
-            startPipelineLambda: buildSystemStack.startPipelineLambda,
             artifactBucket: buildSystemStack.artifactBucket,
             env: env,
             terminationProtection: true,
@@ -68,11 +64,6 @@ export class ProjectStack extends cdk.Stack {
             this,
             "ReleaseBuildRole",
             props.releaseBuildRole.roleArn,
-        );
-        this.startPipelineLambda = lambda.Function.fromFunctionArn(
-            this,
-            "StartPipelineLambda",
-            props.startPipelineLambda.functionArn,
         );
         this.artifactBucket = s3.Bucket.fromBucketArn(
             this,
@@ -300,7 +291,7 @@ export class ProjectStack extends cdk.Stack {
                 actionName: "WaitAction",
                 stateMachine: new stepfunctions.StateMachine(this, "WaitStateMachine", {
                     definition: new stepfunctions.Wait(this, "WaitForProcessingJobs", {
-                        time: stepfunctions.WaitTime.duration(cdk.Duration.hours(8)),
+                        time: stepfunctions.WaitTime.duration(cdk.Duration.hours(2)),
                     }),
                 }),
             }),
@@ -325,19 +316,7 @@ export class ProjectStack extends cdk.Stack {
             const rule = new events.Rule(this, "ScheduledEvent", {
                 schedule: Schedule.expression(p.releasePipelineScheduleExpression),
             });
-            const lambdaInput = events.RuleTargetInput.fromObject({
-                pipelineName: pipelineName,
-                source: {
-                    owner: p.owner,
-                    repo: p.repo,
-                    branch: p.branch,
-                },
-            });
-            rule.addTarget(
-                new targets.LambdaFunction(this.startPipelineLambda, {
-                    event: lambdaInput,
-                }),
-            );
+            rule.addTarget(new targets.CodePipeline(pipeline));
         }
     }
 

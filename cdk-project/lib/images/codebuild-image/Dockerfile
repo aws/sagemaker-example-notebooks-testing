@@ -67,10 +67,10 @@ RUN rm -rf /var/lib/apt/lists/* \
 # copy files
 COPY etc/ssh_config /root/.ssh/config
 COPY scripts/* /usr/local/bin/
-COPY python/dist/sagemakerci*.tar.gz /tmp
+COPY python/dist/notebooks*.tar.gz /tmp
 
-# install sagemakerci
-RUN pip3 install /tmp/sagemakerci*.tar.gz && rm /tmp/sagemakerci*.tar.gz
+# install notebooks CI package
+RUN pip3 install /tmp/notebooks*.tar.gz && rm /tmp/notebooks*.tar.gz
 
 # set environment variables
 ENV IS_CODEBUILD_IMAGE=true

@@ -7,12 +7,12 @@ import time
 subprocess.check_call(["pip", "install", "--upgrade", "botocore", "--target", "/tmp/"])
 subprocess.check_call(["pip", "install", "--upgrade", "boto3", "--target", "/tmp/"])
 sys.path.insert(0, "/tmp/")
+import boto3
+
 # pylint: disable=wrong-import-position
 import botocore
-import boto3
-from botocore.exceptions import ClientError
-
 import common
+from botocore.exceptions import ClientError
 
 logger = common.get_logger()
 

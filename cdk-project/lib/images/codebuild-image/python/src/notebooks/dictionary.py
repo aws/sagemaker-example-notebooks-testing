@@ -1,15 +1,3 @@
-#!/usr/bin/env python3
-import argparse
-import json
-import os
-import re
-import sys
-
-import language_tool_python
-
-from sagemakerci.cli.run_pr_notebooks import notebook_filenames
-
-
 allow_list = {
     "Alexa",
     "Amazon",
@@ -151,6 +139,7 @@ allow_list = {
     ".NET",
     "Boto3",
     "boto3",
+    "boto",
     "Python",
     "Textract",
     "Timestream",
@@ -179,13 +168,6 @@ allow_list = {
     "hyperparameters",
     "Hyperparameter",
     "Hyperparameters",
-    "csv",
-    "CSV",
-    "uri",
-    "URI",
-    "jsonl",
-    "json",
-    "JSON",
     "ContentType",
     "serializers",
     "deserializers",
@@ -450,6 +432,20 @@ allow_list = {
     "GPU",
     "checkpoint",
     "checkpointed",
+    "py",
+    "html",
+    "pdf",
+    "ipynb",
+    "csv",
+    "CSV",
+    "uri",
+    "URI",
+    "jsonl",
+    "json",
+    "JSON",
+    "Explainability",
+    "libsvm",
+    "protobuf",
 }
 
 rules_to_ignore = {
@@ -459,87 +455,3 @@ rules_to_ignore = {
     "EN_QUOTES",
     "WRONG_APOSTROPHE",
 }
-
-
-def parse_args(args):
-    parser = argparse.ArgumentParser(os.path.basename(__file__))
-    parser.set_defaults(func=lambda x: parser.print_usage())
-    parser.add_argument("--pr", help="Pull request number", type=int, required=True)
-
-    parsed = parser.parse_args(args)
-    if not parsed.pr:
-        parser.error("--pr required")
-
-    return parsed
-
-
-def markdown_cells(notebook):
-    with open(notebook) as notebook_file:
-        cells = json.load(notebook_file)["cells"]
-    md_cells = []
-    for cell in cells:
-        if cell["cell_type"] == "markdown":
-            md_cells.append(cell["source"])
-    return md_cells
-
-
-def check_grammar(notebook):
-    tool = language_tool_python.LanguageTool("en-US")
-
-    report = []
-
-    cells = markdown_cells(notebook)
-    for cell in cells:
-        code_block = False
-        for line in cell:
-            stripped_line = line.rstrip().strip(" #*")
-            if stripped_line in ("```python", "```bash", "```"):
-                code_block = not code_block
-            if code_block:
-                continue
-            code_substituted_line = re.sub(
-                "(`)\1{2,}[^`]*(`)\1{2,}|`[^`]*`", "[code]", stripped_line
-            )
-            matches = tool.check(code_substituted_line)
-            report.extend(matches)
-
-    is_correctly_spelled = lambda rule: rule.ruleIssueType == "misspelling" and (
-        rule.matchedText in allow_list
-        or "-" in rule.matchedText
-        or "_" in rule.matchedText
-        or "$" in rule.matchedText
-    )
-    report = [rule for rule in report if not is_correctly_spelled(rule)]
-
-    is_ignored_rule = lambda rule: rule.ruleId in rules_to_ignore
-    report = [rule for rule in report if not is_ignored_rule(rule)]
-
-    return report
-
-
-def main():
-    args = parse_args(sys.argv[1:])
-
-    failures = {}
-
-    for notebook in notebook_filenames(args.pr):
-        report = check_grammar(notebook)
-        if report:
-            failures[notebook] = report
-            basename = os.path.basename(notebook)
-            print("\n" * 2)
-            print(f"* {basename} " + "*" * (97 - len(basename)))
-            print()
-            print("\n\n".join([str(match) for match in report]))
-
-    print("\n" * 2)
-    print("-" * 100)
-    if len(failures) > 0:
-        raise Exception(
-            "One or more notebooks did not pass the spelling and grammar check. Please see above for error messages. "
-            "To fix the text in your notebook, use language_tool_python.utils.correct: https://pypi.org/project/language-tool-python/"
-        )
-
-
-if __name__ == "__main__":
-    main()

@@ -15,23 +15,57 @@
 import asyncio
 import errno
 import io
-import logging
 import json
+import logging
 import os
 import re
 import time
-from subprocess import Popen, PIPE, STDOUT, DEVNULL
 from shlex import split
-import zipfile as zip
+from subprocess import Popen
 
-import botocore
 import boto3
-
-from sagemakerci.utils import default_bucket, get_execution_role
+import botocore
+from notebooks.utils import default_bucket, ensure_session, get_execution_role
 
 abbrev_image_pat = re.compile(
     r"(?P<account>\d+).dkr.ecr.(?P<region>[^.]+).amazonaws.com/(?P<image>[^:/]+)(?P<tag>:[^:]+)?"
 )
+
+
+def describe(job_name, session):
+    """Get the status and exit message for a Processing job.
+
+    Args:
+        job_name (str):
+        session:
+
+    Returns:
+        (str, str): A tuple with the status and the exit message.
+
+    """
+    session = ensure_session(session)
+    client = session.client("sagemaker")
+    response = client.describe_processing_job(ProcessingJobName=job_name)
+    return response["ProcessingJobStatus"], response.get("ExitMessage")
+
+
+def is_running(job_name, session):
+    """Check whether a Processing job is still running.
+
+    Args:
+        job_name (str):
+        session:
+
+    Returns:
+        bool: Whether the Processing job is running.
+
+    """
+    if not job_name:
+        return False
+    status, failure_reason = describe(job_name, session)
+    if status in ("InProgress", "Stopping"):
+        return True
+    return False
 
 
 def abbreviate_image(image):
@@ -105,12 +139,12 @@ def upload_fileobj(notebook_fileobj, session=None):
     """
 
     session = ensure_session(session)
-    snotebook = "notebook-{}.ipynb".format(time.strftime("%Y-%m-%d-%H-%M-%S", time.gmtime()))
+    snotebook = f"notebook-{time.strftime('%Y-%m-%d-%H-%M-%S', time.gmtime())}.ipynb"
 
     s3 = session.client("s3")
     key = "papermill_input/" + snotebook
     bucket = default_bucket(session)
-    s3path = "s3://{}/{}".format(bucket, key)
+    s3path = f"s3://{bucket}/{key}"
     s3.upload_fileobj(notebook_fileobj, bucket, key)
 
     return s3path
@@ -118,7 +152,7 @@ def upload_fileobj(notebook_fileobj, session=None):
 
 def get_output_prefix():
     """Returns an S3 prefix in the Python SDK default bucket."""
-    return "s3://{}/papermill_output".format(default_bucket())
+    return f"s3://{default_bucket()}/papermill_output"
 
 
 def execute_notebook(
@@ -138,14 +172,14 @@ def execute_notebook(
         role = get_execution_role(session)
     elif "/" not in role:
         account = session.client("sts").get_caller_identity()["Account"]
-        role = "arn:aws:iam::{}:role/{}".format(account, role)
+        role = f"arn:aws:iam::{account}:role/{role}"
 
     if "/" not in image:
         account = session.client("sts").get_caller_identity()["Account"]
         region = session.region_name
-        image = "{}.dkr.ecr.{}.amazonaws.com/{}:latest".format(account, region, image)
+        image = f"{account}.dkr.ecr.{region}.amazonaws.com/{image}:latest"
 
-    if notebook == None:
+    if notebook is None:
         notebook = input_path
 
     base = os.path.basename(notebook)
@@ -159,7 +193,7 @@ def execute_notebook(
     )
     input_directory = "/opt/ml/processing/input/"
     local_input = os.path.join(input_directory, os.path.basename(notebook))
-    result = "{}-{}{}".format(nb_name, timestamp, nb_ext)
+    result = f"{nb_name}-{timestamp}{nb_ext}"
     local_output = "/opt/ml/processing/output/"
 
     api_args = {
@@ -271,7 +305,7 @@ def get_output_notebook(job_name, session=None):
 
     prefix = desc["ProcessingOutputConfig"]["Outputs"][0]["S3Output"]["S3Uri"]
     notebook = os.path.basename(desc["Environment"]["PAPERMILL_OUTPUT"])
-    return notebook, "{}/{}".format(prefix, notebook)
+    return notebook, f"{prefix}/{notebook}"
 
 
 def download_notebook(job_name, output=".", session=None):
@@ -295,9 +329,9 @@ def download_notebook(job_name, output=".", session=None):
             if e.errno != errno.EEXIST:
                 raise
 
-    p1 = Popen(split("aws s3 cp --no-progress {} {}/".format(s3path, output)))
+    p1 = Popen(split(f"aws s3 cp --no-progress {s3path} {output}/"))
     p1.wait()
-    return "{}/{}".format(output.rstrip("/"), notebook)
+    return f"{output.rstrip('/')}/{notebook}"
 
 
 def run_notebook(
@@ -341,7 +375,7 @@ def run_notebook(
         instance_type=instance_type,
         session=session,
     )
-    print("Job {} started".format(job_name))
+    print(f"Job {job_name} started")
     status, failure_reason = wait_for_complete(job_name)
     if status == "Completed":
         local = download_notebook(job_name, output=output)
@@ -437,7 +471,7 @@ def describe_run(job_name, session=None):
     if status == "Completed":
         output_prefix = desc["ProcessingOutputConfig"]["Outputs"][0]["S3Output"]["S3Uri"]
         notebook_name = os.path.basename(desc["Environment"]["PAPERMILL_OUTPUT"])
-        result = "{}/{}".format(output_prefix, notebook_name)
+        result = f"{output_prefix}/{notebook_name}"
     else:
         result = None
 
@@ -622,516 +656,3 @@ def download_all(lis, output=".", session=None):
 
     session = ensure_session(session)
     return [download_notebook(job, output, session) for job in lis]
-
-
-def ensure_session(session=None):
-    """If session is None, create a default session and return it. Otherwise return the session passed in"""
-    if session is None:
-        session = boto3.session.Session()
-    return session
-
-
-code_file = "lambda_function.py"
-lambda_function_name = "RunNotebook"
-lambda_description = "A function to run Jupyter notebooks using SageMaker processing jobs"
-
-
-def create_lambda(role=None, session=None):
-    session = ensure_session(session)
-    created = False
-
-    if role is None:
-        print("No role specified, will create a minimal role and policy to execute the lambda")
-        role = create_lambda_role()
-        created = True
-        # time.sleep(30) # wait for eventual consistency, we hope
-
-    if "/" not in role:
-        account = session.client("sts").get_caller_identity()["Account"]
-        role = "arn:aws:iam::{}:role/{}".format(account, role)
-
-    code_bytes = zip_bytes(code_file)
-
-    client = session.client("lambda")
-
-    print("Role={}".format(role))
-    retries = 0
-    while True:
-        try:
-            result = client.create_function(
-                FunctionName=lambda_function_name,
-                Runtime="python3.8",
-                Role=role,
-                Handler="lambda_function.lambda_handler",
-                Code={"ZipFile": code_bytes},
-                Description=lambda_description,
-                Timeout=30,
-                Publish=True,
-            )
-            return result
-        except botocore.exceptions.ClientError as e:
-            if (
-                created
-                and retries < 60
-                and e.response["Error"]["Code"] == "InvalidParameterValueException"
-            ):
-                time.sleep(1)
-            else:
-                raise e
-
-
-def create_lambda_role(name="run-notebook", session=None):
-    """Create a default, minimal IAM role and policy for running the lambda function.
-
-    Args:
-        name (str): The name of the role and policy to create (default: "run-notebook").
-        session (boto3.Session): The boto3 session to use. Will create a default session if not supplied (default: None).
-
-    Returns:
-        str: The ARN of the resulting role.
-    """
-    session = ensure_session(session)
-    iam = session.client("iam")
-    assume_role_policy_doc = {
-        "Version": "2012-10-17",
-        "Statement": [
-            {
-                "Effect": "Allow",
-                "Principal": {"Service": "lambda.amazonaws.com"},
-                "Action": "sts:AssumeRole",
-            }
-        ],
-    }
-    role = iam.create_role(
-        RoleName=name,
-        Description="A role for starting notebook execution from a lambda function",
-        AssumeRolePolicyDocument=json.dumps(assume_role_policy_doc),
-    )
-
-    policy_document = {
-        "Version": "2012-10-17",
-        "Statement": [
-            {
-                "Effect": "Allow",
-                "Action": ["sagemaker:CreateProcessingJob", "iam:PassRole"],
-                "Resource": "*",
-            }
-        ],
-    }
-
-    policy = iam.create_policy(PolicyName=name, PolicyDocument=json.dumps(policy_document))
-
-    iam.attach_role_policy(PolicyArn=policy["Policy"]["Arn"], RoleName=name)
-
-    return role["Role"]["Arn"]
-
-
-def zip_bytes(*files):
-    file_dir = os.path.dirname(os.path.abspath(__file__))
-    zip_io = io.BytesIO()
-    with zip.ZipFile(zip_io, "w") as z:
-        for cf in files:
-            with open("{}/{}".format(file_dir, cf), "rb") as f:
-                code_bytes = f.read()
-            info = zip.ZipInfo(cf)
-            info.external_attr = 0o777 << 16  # give full access to included file
-            z.writestr(info, code_bytes)
-    zip_io.seek(0)
-    return zip_io.read()
-
-
-class InvokeException(Exception):
-    pass
-
-
-def invoke(
-    notebook,
-    image="notebook-runner",
-    input_path=None,
-    output_prefix=None,
-    parameters={},
-    role=None,
-    instance_type="ml.m5.large",
-    extra_fns=[],
-    session=None,
-):
-    """Run a notebook in SageMaker Processing producing a new output notebook.
-
-    Invokes the installed Lambda function to immediately start a notebook execution in a SageMaker Processing Job.
-    Can upload a local notebook file to run or use one previously uploaded to S3. This function returns when
-    the Lambda function does without waiting for the notebook execution. To wait for the job and download the
-    results, see :meth:`wait_for_complete` and :meth:`download_notebook`.
-
-    To add extra arguments to the SageMaker Processing job, you can use the `extra_fns` argument. Each element of
-    that list is a function that takes a dict and returns a dict with new fields added. For example::
-
-        def time_limit(seconds):
-            def proc(extras):
-                extras["StoppingCondition"] = dict(MaxRuntimeInSeconds=seconds)
-                return extras
-            return proc
-
-        job = run.invoke(notebook="powers.ipynb", extra_fns=[time_limit(86400)])
-
-    Args:
-        notebook (str): The notebook name. If `input_path` is None, this is a file to be uploaded before the Lambda is called.
-                        all cases it is used as the name of the notebook when it's running and serves as the base of the
-                        output file name (with a timestamp attached) (required).
-        image (str): The ECR image that defines the environment to run the job (Default: "notebook-runner").
-        input_path (str): The S3 object containing the notebook. If this is None, the `notebook` argument is
-                          taken as a local file to upload (default: None).
-        output_prefix (str): The prefix path in S3 for where to store the output notebook
-                             (default: determined based on SageMaker Python SDK).
-        parameters (dict): The dictionary of parameters to pass to the notebook (default: {}).
-        role (str): The name of a role to use to run the notebook. This can be a name local to the account or a full ARN
-                    (default: calls get_execution_role() or uses "BasicExecuteNotebookRole-<region>" if there's no execution role).
-        instance_type (str): The SageMaker instance to use for executing the job (default: ml.m5.large).
-        extra_fns (list of functions): The list of functions to amend the extra arguments for the processing job.
-        session (boto3.Session): The boto3 session to use. Will create a default session if not supplied (default: None).
-
-    Returns:
-        The name of the processing job created to run the notebook.
-    """
-    session = ensure_session(session)
-
-    if "/" not in image:
-        account = session.client("sts").get_caller_identity()["Account"]
-        region = session.region_name
-        image = "{}.dkr.ecr.{}.amazonaws.com/{}:latest".format(account, region, image)
-
-    if not role:
-        try:
-            role = get_execution_role(session)
-        except ValueError:
-            role = "BasicExecuteNotebookRole-{}".format(session.region_name)
-
-    if "/" not in role:
-        account = session.client("sts").get_caller_identity()["Account"]
-        role = "arn:aws:iam::{}:role/{}".format(account, role)
-
-    if input_path is None:
-        input_path = upload_notebook(notebook)
-    if output_prefix is None:
-        output_prefix = get_output_prefix()
-
-    extra_args = {}
-    for f in extra_fns:
-        extra_args = f(extra_args)
-
-    args = {
-        "image": image,
-        "input_path": input_path,
-        "output_prefix": output_prefix,
-        "notebook": os.path.basename(notebook),
-        "parameters": parameters,
-        "role": role,
-        "instance_type": instance_type,
-        "extra_args": extra_args,
-    }
-
-    client = session.client("lambda")
-
-    result = client.invoke(
-        FunctionName=lambda_function_name,
-        InvocationType="RequestResponse",
-        LogType="None",
-        Payload=json.dumps(args).encode("utf-8"),
-    )
-    payload = json.loads(result["Payload"].read())
-    if "errorMessage" in payload:
-        raise InvokeException(payload["errorMessage"])
-
-    job = payload["job_name"]
-    return job
-
-
-RULE_PREFIX = "RunNotebook-"
-
-
-def schedule(
-    notebook,
-    rule_name,
-    schedule=None,
-    event_pattern=None,
-    image="notebook-runner",
-    input_path=None,
-    output_prefix=None,
-    parameters={},
-    role=None,
-    instance_type="ml.m5.large",
-    extra_fns=[],
-    session=None,
-):
-    """Create a schedule for running a notebook in SageMaker Processing.
-
-    Creates a CloudWatch Event rule to invoke the installed Lambda either on the provided schedule or in response
-    to the provided event. \
-  
-    :meth:`schedule` can upload a local notebook file to run or use one previously uploaded to S3. 
-    To find jobs run by the schedule, see :meth:`list_runs` using the `rule` argument to filter to 
-    a specific rule. To download the results, see :meth:`download_notebook` (or :meth:`download_all` 
-    to download a group of notebooks based on a :meth:`list_runs` call).
-
-    To add extra arguments to the SageMaker Processing job, you can use the `extra_fns` argument. Each element of 
-    that list is a function that takes a dict and returns a dict with new fields added. For example::
-
-        def time_limit(seconds):
-            def proc(extras):
-                extras["StoppingCondition"] = dict(MaxRuntimeInSeconds=seconds)
-                return extras
-            return proc
-
-        job = run.schedule(notebook="powers.ipynb", rule_name="Powers", schedule="rate(1 hour)", extra_fns=[time_limit(86400)])
-
-    Args:
-        notebook (str): The notebook name. If `input_path` is None, this is a file to be uploaded before the Lambda is called.
-                        all cases it is used as the name of the notebook when it's running and serves as the base of the 
-                        output file name (with a timestamp attached) (required).
-        rule_name (str): The name of the rule for CloudWatch Events (required).
-        schedule (str): A schedule string which defines when the job should be run. For details, 
-                        see https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html 
-                        (default: None. Note: one of `schedule` or `event_pattern` must be specified).
-        event_pattern (str): A pattern for events that will trigger notebook execution. For details, 
-                             see https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/CloudWatchEventsandEventPatterns.html. 
-                             (default: None. Note: one of `schedule` or `event_pattern` must be specified).
-        image (str): The ECR image that defines the environment to run the job (Default: "notebook-runner").
-        input_path (str): The S3 object containing the notebook. If this is None, the `notebook` argument is
-                          taken as a local file to upload (default: None).
-        output_prefix (str): The prefix path in S3 for where to store the output notebook 
-                             (default: determined based on SageMaker Python SDK).
-        parameters (dict): The dictionary of parameters to pass to the notebook (default: {}).
-        role (str): The name of a role to use to run the notebook. This can be a name local to the account or a full ARN
-                    (default: calls get_execution_role() or uses "BasicExecuteNotebookRole-<region>" if there's no execution role).
-        instance_type (str): The SageMaker instance to use for executing the job (default: ml.m5.large).
-        extra_fns (list of functions): The list of functions to amend the extra arguments for the processing job.
-        session (boto3.Session): The boto3 session to use. Will create a default session if not supplied (default: None).
-    """
-    kwargs = {}
-    if schedule != None:
-        kwargs["ScheduleExpression"] = schedule
-    if event_pattern != None:
-        kwargs["EventPattern"] = event_pattern
-    if len(kwargs) == 0:
-        raise Exception("Must specify one of schedule or event_pattern")
-
-    session = ensure_session(session)
-
-    # prepend a common prefix to the rule so it's easy to find notebook rules
-    prefixed_rule_name = RULE_PREFIX + rule_name
-
-    if "/" not in image:
-        account = session.client("sts").get_caller_identity()["Account"]
-        region = session.region_name
-        image = "{}.dkr.ecr.{}.amazonaws.com/{}:latest".format(account, region, image)
-
-    if not role:
-        try:
-            role = get_execution_role(session)
-        except ValueError:
-            role = "BasicExecuteNotebookRole-{}".format(session.region_name)
-
-    if "/" not in role:
-        account = session.client("sts").get_caller_identity()["Account"]
-        role = "arn:aws:iam::{}:role/{}".format(account, role)
-
-    if input_path is None:
-        input_path = upload_notebook(notebook)
-    if output_prefix is None:
-        output_prefix = get_output_prefix()
-
-    extra_args = {}
-    for f in extra_fns:
-        extra_args = f(extra_args)
-
-    args = {
-        "image": image,
-        "input_path": input_path,
-        "output_prefix": output_prefix,
-        "notebook": os.path.basename(notebook),
-        "parameters": parameters,
-        "role": role,
-        "instance_type": instance_type,
-        "extra_args": extra_args,
-        "rule_name": rule_name,
-    }
-
-    events = boto3.client("events")
-
-    result = events.put_rule(
-        Name=prefixed_rule_name,
-        Description='Rule to run the Jupyter notebook "{}"'.format(notebook),
-        **kwargs,
-    )
-
-    rule_arn = result["RuleArn"]
-
-    lambda_ = session.client("lambda")
-    lambda_.add_permission(
-        StatementId="EB-{}".format(rule_name),
-        Action="lambda:InvokeFunction",
-        FunctionName="RunNotebook",
-        Principal="events.amazonaws.com",
-        SourceArn=rule_arn,
-    )
-
-    account = session.client("sts").get_caller_identity()["Account"]
-    region = session.region_name
-    target_arn = "arn:aws:lambda:{}:{}:function:{}".format(region, account, lambda_function_name)
-
-    result = events.put_targets(
-        Rule=prefixed_rule_name,
-        Targets=[{"Id": "Default", "Arn": target_arn, "Input": json.dumps(args)}],
-    )
-
-
-def unschedule(rule_name, session=None):
-    """Delete an existing notebook schedule rule.
-
-    Args:
-        rule_name (str): The name of the rule for CloudWatch Events (required).
-        session (boto3.Session): The boto3 session to use. Will create a default session if not supplied (default: None).
-    """
-    prefixed_rule_name = RULE_PREFIX + rule_name
-
-    session = ensure_session(session)
-    events = boto3.client("events")
-    lambda_ = session.client("lambda")
-
-    try:
-        lambda_.remove_permission(FunctionName="RunNotebook", StatementId="EB-{}".format(rule_name))
-    except botocore.exceptions.ClientError as ce:
-        message = ce.response.get("Error", {}).get("Message", "Unknown error")
-        if not "is not found" in message:  # ignore it if the permission was already deleted
-            raise
-
-    events.remove_targets(Rule=prefixed_rule_name, Ids=["Default"])
-
-    events.delete_rule(Name=prefixed_rule_name)
-
-
-def describe_schedules(n=0, rule_prefix=None, session=None):
-    """A generator that returns descriptions of all the notebook schedule rules
-
-    Args:
-       n (int): The number of rules to return or all runs if 0 (default: 0)
-       rule_prefix (str): If not None, return only rules whose names begin with the prefix (default: None)
-       session (boto3.Session): The boto3 session to use. Will create a default session if not supplied (default: None)."""
-
-    if not rule_prefix:
-        rule_prefix = ""
-    rule_prefix = RULE_PREFIX + rule_prefix
-
-    session = ensure_session(session)
-    client = session.client("events")
-    paginator = client.get_paginator("list_rules")
-    page_iterator = paginator.paginate(NamePrefix=rule_prefix)
-
-    for page in page_iterator:
-        for item in page["Rules"]:
-            rule_name = item["Name"][len(RULE_PREFIX) :]
-            d = describe_schedule(rule_name, item, session)
-            yield d
-
-            if n > 0:
-                n = n - 1
-                if n == 0:
-                    return
-
-
-def describe_schedule(rule_name, rule_item=None, session=None):
-    """Describe a notebook execution schedule.
-
-    Args:
-     rule_name (str): The name of the schedule rule to describe. (Required)
-     rule_item: Only used to optimize :meth:`describe_schedules`. Should be omitted in normal use. (Default: None)
-
-    Returns:
-      A dictionary with keys for each element of the rule. For example::
-
-        {'name': 'Powers',
-        'notebook': 'powers.ipynb',
-        'parameters': {},
-        'schedule': 'rate(1 hour)',
-        'event_pattern': None,
-        'image': 'notebook-runner',
-        'instance': 'ml.m5.large',
-        'role': 'BasicExecuteNotebookRole-us-west-2',
-        'state': 'ENABLED',
-        'input_path': 's3://sagemaker-us-west-2-123456789012/papermill_input/notebook-2020-11-02-19-49-24.ipynb',
-        'output_prefix': 's3://sagemaker-us-west-2-123456789012/papermill_output'}
-    """
-    rule_name = RULE_PREFIX + rule_name
-    session = ensure_session(session)
-    ev = session.client("events")
-
-    if not rule_item:
-        rule_item = ev.describe_rule(Name=rule_name)
-
-    targets = ev.list_targets_by_rule(Rule=rule_name)
-    if "Targets" in targets and len(targets["Targets"]) > 0:
-        target = targets["Targets"][0]
-        inp = json.loads(target["Input"])
-    else:
-        # This is a broken rule. This could happen if we have weird IAM permissions and try to do a delete.
-        inp = {}
-
-    d = dict(
-        name=rule_name[len(RULE_PREFIX) :],
-        notebook=inp.get("notebook", ""),
-        parameters=inp.get("parameters", ""),
-        schedule=rule_item.get("ScheduleExpression"),
-        event_pattern=rule_item.get("EventPattern"),
-        image=abbreviate_image(inp.get("image", "")),
-        instance=inp.get("instance_type", ""),
-        role=abbreviate_role(inp.get("role", "")),
-        state=rule_item["State"],
-        input_path=inp.get("input_path", ""),
-        output_prefix=inp.get("output_prefix", ""),
-    )
-
-    return d
-
-
-image_pat = re.compile(r"([0-9]+)\.[^/]+/(.*)$")
-
-
-def base_image(s):
-    """Determine just the repo and tag from the ECR image descriptor"""
-    m = image_pat.match(s)
-    if m:
-        return m.group(2)
-    else:
-        return s
-
-
-role_pat = re.compile(r"arn:aws:iam::([0-9]+):role/(.*)$")
-
-
-def base_role(s):
-    """Determine just the role name from a role arn"""
-    m = role_pat.match(s)
-    if m:
-        return m.group(2)
-    else:
-        return s
-
-
-def list_schedules(n=0, rule_prefix=None, session=None):
-    """Return a pandas data frame of the schedule rules.
-
-    Args:
-        n (int): The number of rules to return or all rules if 0 (default: 0)
-        rule_prefix (str): If not None, return only rules whose names begin with the prefix (default: None)
-        session (boto3.Session): The boto3 session to use. Will create a default session if not supplied (default: None).
-    """
-    import pandas as pd  # pylint: disable=import-error
-
-    l = pd.DataFrame(describe_schedules(n=n, rule_prefix=rule_prefix, session=session))
-    if l is not None and l.shape[0] > 0:
-        l = l.drop(columns=["input_path", "output_prefix"])
-        l["image"] = l["image"].map(base_image)
-        l["role"] = l["role"].map(base_role)
-        for c in ["schedule", "event_pattern"]:
-            l[c] = l[c].map(lambda x: x if x else "")
-
-    return l

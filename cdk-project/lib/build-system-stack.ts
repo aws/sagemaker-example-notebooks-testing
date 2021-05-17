@@ -16,7 +16,6 @@ export class BuildSystemStack extends cdk.Stack {
     readonly pullRequestBuildRole: iam.Role;
     readonly releaseBuildRole: iam.Role;
     readonly gitHubWebhookLambda: lambda.Function;
-    readonly startPipelineLambda: lambda.Function;
     readonly ec2TestRole: iam.Role;
     readonly pullRequestBuildEcrRepo: ecr.Repository;
     readonly artifactBucket: s3.Bucket;
@@ -30,7 +29,6 @@ export class BuildSystemStack extends cdk.Stack {
         this.ec2TestRole = this.createEc2TestRole();
         this.pullRequestBuildEcrRepo = this.createPullRequestBuildEcrRepo();
         this.gitHubWebhookLambda = this.createGitHubWebhookLambda();
-        this.startPipelineLambda = this.createStartPipelineLambda();
 
         // Keep endpoints for 45 mins, logs for 3 days
         common.createResourceCleaningLambdas(this, Duration.minutes(45), Duration.days(3));
@@ -65,28 +63,6 @@ export class BuildSystemStack extends cdk.Stack {
         new apig.LambdaRestApi(this, "GitHubWebhookApi", {
             handler: func,
         });
-
-        return func;
-    }
-
-    createStartPipelineLambda(): lambda.Function {
-        const func = new lambda.Function(this, "StartPipelineLambda", {
-            description: "Receives Cloudwatch Scheduled Event and starts a CodePipeline pipeline",
-            code: lambda.Code.fromAsset(path.join(__dirname, "../lambda/python-functions")),
-            handler: "start_pipeline.handler",
-            runtime: lambda.Runtime.PYTHON_3_6,
-            timeout: Duration.minutes(5),
-        });
-
-        func.addPermission("AllowCloudWatchInvocation", {
-            principal: new iam.ServicePrincipal("events.amazonaws.com"),
-        });
-
-        const policy = new iam.PolicyStatement();
-        policy.addActions("codepipeline:StartPipelineExecution", "secretsmanager:GetSecretValue");
-        policy.addAllResources();
-
-        func.addToRolePolicy(policy);
 
         return func;
     }

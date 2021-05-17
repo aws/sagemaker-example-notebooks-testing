@@ -1,9 +1,8 @@
-import datetime
 import collections
+import datetime
 import json
 
 import boto3
-
 import common
 
 GitHubUser = collections.namedtuple("GitHubUser", "id, login")

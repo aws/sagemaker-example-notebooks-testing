@@ -3,9 +3,7 @@ import argparse
 import os
 import sys
 
-from sagemakerci.git import Git
-
-from github import Github
+from notebooks import parse
 
 
 def parse_args(args):
@@ -20,19 +18,10 @@ def parse_args(args):
     return parsed
 
 
-def is_notebook(filename):
-    root, ext = os.path.splitext(filename)
-    if ext == ".ipynb":
-        return os.path.exists(filename)
-
-
 def main():
     args = parse_args(sys.argv[1:])
 
-    g = Github(Git().oauth_token)
-    repo = g.get_repo("aws/amazon-sagemaker-examples")
-    pr = repo.get_pull(args.pr)
-    filenames = filter(is_notebook, [file.filename for file in pr.get_files()])
+    filenames = parse.pr_notebook_filenames(args.pr)
     filenames_string = " ".join(filenames)
     print(filenames_string)  # This returns the string to bash scripts calling this python script
 

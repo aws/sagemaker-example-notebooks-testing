@@ -3,20 +3,11 @@ import argparse
 import os
 import sys
 import time
-
 from datetime import datetime
-from pathlib import Path
 
 import pandas as pd
-
-from sagemakerci.run_notebook import (
-    ensure_session,
-    get_output_prefix,
-    upload_notebook,
-    execute_notebook,
-    get_output_notebook,
-)
-from sagemakerci.utils import default_bucket
+from notebooks.run import execute_notebook, get_output_notebook, get_output_prefix, upload_notebook
+from notebooks.utils import default_bucket, ensure_session
 
 
 def parse_args(args):
@@ -27,10 +18,6 @@ def parse_args(args):
     parsed = parser.parse_args(args)
 
     return parsed
-
-
-def notebook_filenames():
-    return list(Path(".").rglob("*.ipynb"))
 
 
 def save_csv_to_s3(df, csv_name):
@@ -60,19 +47,19 @@ def main():
     runtimes = []
     statuses = []
     errors = []
+    dates = []
 
     sagemaker = session.client("sagemaker")
     for index, row in df.iterrows():
         job_name = row["processing-job-name"]
-
-        response = sagemaker.describe_processing_job(ProcessingJobName=job_name)
-
         if job_name == "None":
             uri = "None"
             runtime = 0
             status = "Skipped"
             error = "This notebook was skipped because it either uses Docker or Local Mode."
+            date = datetime.now().strftime("%Y-%m-%d")
         else:
+            response = sagemaker.describe_processing_job(ProcessingJobName=job_name)
             notebook, uri = get_output_notebook(job_name, session)
             runtime = (
                 response.get("ProcessingEndTime", datetime.now())
@@ -80,19 +67,23 @@ def main():
             ).total_seconds()
             status = response.get("ProcessingJobStatus")
             error = response.get("ExitMessage")
+            date = response.get("ProcessingEndTime", datetime.now()).strftime("%Y-%m-%d")
 
         output_notebooks.append(uri)
         runtimes.append(runtime)
         statuses.append(status)
         errors.append(error)
+        dates.append(date)
 
         print(job_name)
         time.sleep(1)
 
-    df["output notebook"] = output_notebooks
+    df["output"] = output_notebooks
     df["runtime"] = runtimes
     df["status"] = statuses
     df["error"] = errors
+
+    df.insert(loc=0, column="date", value=dates)
 
     print("\n" * 2)
     print("-" * 100)

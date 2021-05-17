@@ -35,7 +35,7 @@ def main():
 
     print("\n" * 2)
     print("-" * 100)
-    if len(failures) > 0:
+    if failures:
         raise Exception(
             "One or more notebooks did not pass the spelling and grammar check. Please see above for error messages. "
             "To fix the text in your notebook, use language_tool_python.utils.correct: https://pypi.org/project/language-tool-python/"

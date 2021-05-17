@@ -179,7 +179,7 @@ def execute_notebook(
         region = session.region_name
         image = f"{account}.dkr.ecr.{region}.amazonaws.com/{image}:latest"
 
-    if notebook == None:
+    if notebook is None:
         notebook = input_path
 
     base = os.path.basename(notebook)

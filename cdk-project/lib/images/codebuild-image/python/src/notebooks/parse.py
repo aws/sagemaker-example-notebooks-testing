@@ -80,11 +80,7 @@ def code_cells(notebook):
     """
     with open(notebook) as notebook_file:
         cells = json.load(notebook_file)["cells"]
-    code_cells = []
-    for cell in cells:
-        if cell["cell_type"] == "code":
-            code_cells.append(cell["source"])
-    return code_cells
+    return [cell["source"] for cell in cells if cell["cell_type"] == "code"]
 
 
 def contains_code(notebook, snippets):
@@ -120,8 +116,4 @@ def markdown_cells(notebook):
     """
     with open(notebook) as notebook_file:
         cells = json.load(notebook_file)["cells"]
-    md_cells = []
-    for cell in cells:
-        if cell["cell_type"] == "markdown":
-            md_cells.append(cell["source"])
-    return md_cells
+    return [cell["source"] for cell in cells if cell["cell_type"] == "markdown"]

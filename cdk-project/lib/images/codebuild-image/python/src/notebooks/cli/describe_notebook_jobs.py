@@ -57,7 +57,7 @@ def main():
             runtime = 0
             status = "Skipped"
             error = "This notebook was skipped because it either uses Docker or Local Mode."
-            date = datetime.today().strftime("%Y-%m-%d")
+            date = datetime.now().strftime("%Y-%m-%d")
         else:
             response = sagemaker.describe_processing_job(ProcessingJobName=job_name)
             notebook, uri = get_output_notebook(job_name, session)

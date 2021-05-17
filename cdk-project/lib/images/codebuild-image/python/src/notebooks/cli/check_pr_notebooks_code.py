@@ -36,7 +36,7 @@ def main():
 
     print("\n" * 2)
     print("-" * 100)
-    if len(failures) > 0:
+    if failures:
         raise Exception(
             "One or more notebooks did not pass the code formatting check. Please see above for error messages. "
             "To reformat the code in your notebook, use black-nb: https://pypi.org/project/black-nb/ "

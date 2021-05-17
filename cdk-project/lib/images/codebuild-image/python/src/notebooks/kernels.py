@@ -1,6 +1,6 @@
 import boto3
-from notebooks import parse
 
+import notebooks
 
 def get_latest_image_digest(registry, repository):
     """Get the latest Docker image digest for a given registry ID and ECR repository.
@@ -45,7 +45,7 @@ def kernel_type_for(notebook):
         str: The kernel type (eg. "MXNet", "PyTorch", "TensorFlow 1", "TensorFlow 2", "Spark", or "Data Science")
 
     """
-    kernel_name = parse.kernel_for(notebook)
+    kernel_name = notebooks.parse.kernel_for(notebook)
 
     if kernel_name:
         if any(

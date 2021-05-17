@@ -5,7 +5,9 @@ import sys
 import time
 
 import pandas as pd
-from notebooks import kernels, parse
+
+import notebooks
+
 from notebooks.run import (
     ensure_session,
     execute_notebook,
@@ -56,19 +58,19 @@ def save_csv_to_s3(notebooks, job_names, kernels):
 def main():
     args = parse_args(sys.argv[1:])
 
-    notebooks = parse.all_notebook_filenames()
+    notebook_names = notebooks.parse.all_notebook_filenames()
     job_names = []
     kernel_names = []
 
     session = ensure_session()
     instance_type = args.instance or "ml.m5.xlarge"
-    for notebook in notebooks:
-        if args.skip_docker and parse.contains_code(
+    for notebook in notebook_names:
+        if args.skip_docker and notebooks.parse.contains_code(
             notebook, ["docker ", 'instance_type = "local"']
         ):
             job_name = None
         else:
-            image = kernels.kernel_image_for(notebook)
+            image = notebooks.kernels.kernel_image_for(notebook)
             s3path = upload_notebook(notebook, session)
             job_name = execute_notebook(
                 image=image,
@@ -83,12 +85,12 @@ def main():
 
         print(job_name)
         job_names.append(str(job_name))
-        kernel_names.append(kernels.kernel_type_for(notebook))
+        kernel_names.append(notebooks.kernels.kernel_type_for(notebook))
 
     print("\n" * 2)
     print("-" * 100)
     print("\n" * 2)
-    print(save_csv_to_s3(notebooks, job_names, kernel_names))
+    print(save_csv_to_s3(notebook_names, job_names, kernel_names))
 
 
 if __name__ == "__main__":

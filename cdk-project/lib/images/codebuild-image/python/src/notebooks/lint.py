@@ -3,8 +3,8 @@ import re
 import black
 import language_tool_python
 from black_nb.cli import TARGET_VERSIONS, SubReport, format_file_in_place
-from notebooks import dictionary, parse
 
+import notebooks
 
 def check_grammar(notebook):
     """Run LanguageTool against the given notebook.
@@ -20,7 +20,7 @@ def check_grammar(notebook):
 
     report = []
 
-    cells = parse.markdown_cells(notebook)
+    cells = notebooks.parse.markdown_cells(notebook)
     for cell in cells:
         code_block = False
         for line in cell:
@@ -36,14 +36,14 @@ def check_grammar(notebook):
             report.extend(matches)
 
     is_correctly_spelled = lambda rule: rule.ruleIssueType == "misspelling" and (
-        rule.matchedText in dictionary.allow_list
+        rule.matchedText in notebooks.dictionary.allow_list
         or "-" in rule.matchedText
         or "_" in rule.matchedText
         or "$" in rule.matchedText
     )
     report = [rule for rule in report if not is_correctly_spelled(rule)]
 
-    is_ignored_rule = lambda rule: rule.ruleId in dictionary.rules_to_ignore
+    is_ignored_rule = lambda rule: rule.ruleId in notebooks.dictionary.rules_to_ignore
     report = [rule for rule in report if not is_ignored_rule(rule)]
 
     return report

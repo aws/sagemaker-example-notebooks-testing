@@ -4,7 +4,8 @@ import os
 import sys
 import time
 
-from notebooks import kernels, parse
+import notebooks
+
 from notebooks.run import (
     ensure_session,
     execute_notebook,
@@ -42,13 +43,13 @@ def main():
 
     session = ensure_session()
     instance_type = args.instance or "ml.m5.xlarge"
-    for notebook in parse.pr_notebook_filenames(args.pr):
-        if args.skip_docker and parse.contains_code(
+    for notebook in notebooks.parse.pr_notebook_filenames(args.pr):
+        if args.skip_docker and notebooks.parse.contains_code(
             notebook, ["docker ", 'instance_type = "local"']
         ):
             job_name = None
         else:
-            image = kernels.kernel_image_for(notebook)
+            image = notebooks.kernels.kernel_image_for(notebook)
             s3path = upload_notebook(notebook, session)
             job_name = execute_notebook(
                 image=image,
@@ -86,7 +87,7 @@ def main():
                 print("*")
                 print(f"* {'job name':>11}: {str(job_name):<11}")
                 print("*")
-                print(f"* {'kernel':>11}: {kernels.kernel_type_for(notebook):<11}")
+                print(f"* {'kernel':>11}: {notebooks.kernels.kernel_type_for(notebook):<11}")
                 print("*")
                 print(f"* {'status':>11}: {status:<11}")
                 print("*")

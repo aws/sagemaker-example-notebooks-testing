@@ -3,7 +3,7 @@ import argparse
 import os
 import sys
 
-import notebooks
+from notebooks import lint, parse
 
 
 def parse_args(args):
@@ -23,8 +23,8 @@ def main():
 
     failures = {}
 
-    for notebook in notebooks.parse.pr_notebook_filenames(args.pr):
-        failed, report = notebooks.lint.check_code_format(notebook)
+    for notebook in parse.pr_notebook_filenames(args.pr):
+        failed, report = lint.check_code_format(notebook)
         if failed:
             failures[notebook] = report
             basename = os.path.basename(notebook)

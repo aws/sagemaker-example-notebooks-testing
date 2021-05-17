@@ -4,16 +4,9 @@ import os
 import sys
 import time
 
-import pandas as pd
-
 import notebooks
-
-from notebooks.run import (
-    ensure_session,
-    execute_notebook,
-    get_output_prefix,
-    upload_notebook,
-)
+import pandas as pd
+from notebooks.run import ensure_session, execute_notebook, get_output_prefix, upload_notebook
 from notebooks.utils import default_bucket
 
 

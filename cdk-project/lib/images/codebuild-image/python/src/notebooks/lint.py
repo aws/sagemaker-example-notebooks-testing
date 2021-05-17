@@ -2,9 +2,9 @@ import re
 
 import black
 import language_tool_python
+import notebooks
 from black_nb.cli import TARGET_VERSIONS, SubReport, format_file_in_place
 
-import notebooks
 
 def check_grammar(notebook):
     """Run LanguageTool against the given notebook.

@@ -5,6 +5,7 @@ import sys
 
 import notebooks
 
+
 def parse_args(args):
     parser = argparse.ArgumentParser(os.path.basename(__file__))
     parser.set_defaults(func=lambda x: parser.print_usage())

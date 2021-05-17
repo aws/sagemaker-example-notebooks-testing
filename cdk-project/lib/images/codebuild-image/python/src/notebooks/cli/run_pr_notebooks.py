@@ -5,7 +5,6 @@ import sys
 import time
 
 import notebooks
-
 from notebooks.run import (
     ensure_session,
     execute_notebook,

@@ -1,6 +1,6 @@
 import boto3
-
 import notebooks
+
 
 def get_latest_image_digest(registry, repository):
     """Get the latest Docker image digest for a given registry ID and ECR repository.

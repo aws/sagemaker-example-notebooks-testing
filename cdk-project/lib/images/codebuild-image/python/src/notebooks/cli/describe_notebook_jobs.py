@@ -56,7 +56,7 @@ def main():
             uri = "None"
             runtime = 0
             status = "Skipped"
-            error = "This notebook was skipped because it either uses Docker or Local Mode."
+            error = "UsesDocker"
             date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
         else:
             response = sagemaker.describe_processing_job(ProcessingJobName=job_name)
@@ -66,10 +66,18 @@ def main():
                 - response.get("ProcessingStartTime", datetime.now(timezone.utc))
             ).total_seconds()
             status = response.get("ProcessingJobStatus")
-            error = response.get("ExitMessage")
             date = response.get("ProcessingEndTime", datetime.now(timezone.utc)).strftime(
                 "%Y-%m-%d"
             )
+
+            error = response.get("ExitMessage")
+            if error == "Kernel died":
+                error = "KernelDied"
+            elif error:
+                lines = error.splitlines()
+                error_message = lines[-1]
+                error_type, error_details = error_message.split(":")
+                error = error_type or "Uncategorized"
 
         output_notebooks.append(uri)
         runtimes.append(runtime)

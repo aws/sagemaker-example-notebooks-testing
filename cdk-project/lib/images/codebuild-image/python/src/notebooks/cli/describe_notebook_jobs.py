@@ -63,7 +63,7 @@ def main():
             notebook, uri = get_output_notebook(job_name, session)
             runtime = (
                 response.get("ProcessingEndTime", datetime.now())
-                - response.get("ProcessingStartTime")
+                - response.get("ProcessingStartTime", datetime.now())
             ).total_seconds()
             status = response.get("ProcessingJobStatus")
             error = response.get("ExitMessage")

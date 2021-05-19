@@ -50,13 +50,20 @@ def kernel_type_for(notebook):
     if kernel_name:
         if any(
             name in kernel_name
-            for name in ("MXNet", "conda_mxnet_latest_p37", "conda_mxnet_p27", "conda_mxnet_p36")
+            for name in (
+                "MXNet",
+                "mxnet",
+                "conda_mxnet_latest_p37",
+                "conda_mxnet_p27",
+                "conda_mxnet_p36",
+            )
         ):
             return "MXNet"
         elif any(
             name in kernel_name
             for name in (
                 "PyTorch",
+                "pytorch",
                 "conda_pytorch_latest_p36",
                 "conda_pytorch_p27",
                 "conda_pytorch_p36",
@@ -65,10 +72,18 @@ def kernel_type_for(notebook):
             return "PyTorch"
         elif any(
             name in kernel_name
-            for name in ("TensorFlow 1", "conda_tensorflow_p27", "conda_tensorflow_p36")
+            for name in (
+                "TensorFlow 1",
+                "conda_tensorflow_p27",
+                "conda_tensorflow_p36",
+                "tensorflow_p36",
+            )
         ):
             return "TensorFlow 1"
-        elif any(name in kernel_name for name in ("TensorFlow 2", "conda_tensorflow2_p36")):
+        elif any(
+            name in kernel_name
+            for name in ("TensorFlow 2", "conda_tensorflow2_p36", "tensorflow2_p36")
+        ):
             return "TensorFlow 2"
         elif any(name in kernel_name for name in ("SparkMagic", "PySpark", "pysparkkernel")):
             return "Spark"

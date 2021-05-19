@@ -3,7 +3,7 @@ import argparse
 import os
 import sys
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 
 import pandas as pd
 from notebooks.run import execute_notebook, get_output_notebook, get_output_prefix, upload_notebook
@@ -57,17 +57,19 @@ def main():
             runtime = 0
             status = "Skipped"
             error = "This notebook was skipped because it either uses Docker or Local Mode."
-            date = datetime.now().strftime("%Y-%m-%d")
+            date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
         else:
             response = sagemaker.describe_processing_job(ProcessingJobName=job_name)
             notebook, uri = get_output_notebook(job_name, session)
             runtime = (
-                response.get("ProcessingEndTime", datetime.now())
-                - response.get("ProcessingStartTime", datetime.now())
+                response.get("ProcessingEndTime", datetime.now(timezone.utc))
+                - response.get("ProcessingStartTime", datetime.now(timezone.utc))
             ).total_seconds()
             status = response.get("ProcessingJobStatus")
             error = response.get("ExitMessage")
-            date = response.get("ProcessingEndTime", datetime.now()).strftime("%Y-%m-%d")
+            date = response.get("ProcessingEndTime", datetime.now(timezone.utc)).strftime(
+                "%Y-%m-%d"
+            )
 
         output_notebooks.append(uri)
         runtimes.append(runtime)

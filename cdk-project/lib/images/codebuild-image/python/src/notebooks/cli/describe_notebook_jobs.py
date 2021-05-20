@@ -77,7 +77,7 @@ def main():
                 found_error_type = False
                 valid_error_types = ("Exception:", "Error:", "InvalidArn:", "NotFound:", "InUse:")
                 lines = error.splitlines()
-                for line in lines.reverse():
+                for line in reversed(lines):
                     if any(error_type in line for error_type in valid_error_types):
                         error = line.split(":", 1)[0]
                         found_error_type = True

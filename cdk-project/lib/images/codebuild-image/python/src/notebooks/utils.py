@@ -32,7 +32,7 @@ def kms_key(session=None):
     """
     session = ensure_session(session)
     kms = session.client("kms")
-    response = kms.describe_key("alias/papermill")
+    response = kms.describe_key(KeyId="alias/papermill")
     return response["KeyMetadata"]["Arn"]
 
 

@@ -76,7 +76,7 @@ def main():
             elif error:
                 lines = error.splitlines()
                 error_message = lines[-1]
-                error_type, error_details = error_message.split(":")
+                error_type, error_details = error_message.split(":", 1)
                 error = error_type or "Uncategorized"
 
         output_notebooks.append(uri)

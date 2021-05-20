@@ -12,7 +12,7 @@ from notebooks.run import (
     upload_notebook,
     wait_for_complete,
 )
-from notebooks.utils import ensure_session
+from notebooks.utils import ensure_session, kms_key
 
 
 def parse_args(args):
@@ -50,6 +50,7 @@ def main():
         else:
             image = kernels.kernel_image_for(notebook)
             s3path = upload_notebook(notebook, session)
+            parameters = {"kms_key": kms_key()}
             job_name = execute_notebook(
                 image=image,
                 input_path=s3path,
@@ -58,7 +59,7 @@ def main():
                 instance_type=instance_type,
                 session=session,
                 output_prefix=get_output_prefix(),
-                parameters={},
+                parameters=parameters,
             )
             time.sleep(1)
 

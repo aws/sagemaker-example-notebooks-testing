@@ -7,7 +7,7 @@ import time
 import pandas as pd
 from notebooks import kernels, parse
 from notebooks.run import execute_notebook, get_output_prefix, upload_notebook
-from notebooks.utils import default_bucket, ensure_session
+from notebooks.utils import default_bucket, ensure_session, kms_key
 
 
 def parse_args(args):
@@ -65,6 +65,7 @@ def main():
         else:
             image = kernels.kernel_image_for(notebook)
             s3path = upload_notebook(notebook, session)
+            parameters = {"kms_key": kms_key()}
             job_name = execute_notebook(
                 image=image,
                 input_path=s3path,
@@ -72,7 +73,7 @@ def main():
                 instance_type=instance_type,
                 session=session,
                 output_prefix=get_output_prefix(),
-                parameters={},
+                parameters=parameters,
             )
             time.sleep(1)
 

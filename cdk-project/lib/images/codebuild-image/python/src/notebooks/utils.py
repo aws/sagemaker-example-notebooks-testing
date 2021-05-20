@@ -19,8 +19,23 @@ import botocore
 _default_bucket = None
 _default_bucket_name_override = None
 
-# Utility functions that are copied and pasted from the SageMaker Python SDK so that we
-# don't need to include that and all its dependencies.
+
+def kms_key(session=None):
+    """Get the Papermill KMS key ARN.
+
+    Args:
+        session:
+
+    Returns:
+        str: The ARN for the Papermill KMS key.
+
+    """
+    session = ensure_session(session)
+    kms = session.client("kms")
+    response = kms.describe_key("alias/papermill")
+    return response["KeyMetadata"]["Arn"]
+
+
 def default_bucket(session=None):
     """Return the name of the default bucket to use in relevant Amazon SageMaker interactions.
 

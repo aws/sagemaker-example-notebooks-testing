@@ -74,11 +74,15 @@ def main():
             if error == "Kernel died":
                 error = "KernelDied"
             elif error:
+                found_error_type = False
+                valid_error_types = ("Exception:", "Error:", "InvalidArn:", "NotFound:", "InUse:")
                 lines = error.splitlines()
-                error_message = lines[-1].split(":", 1)
-                if len(error_message) == 2:
-                    error = error_message[0]
-                else:
+                for line in lines.reverse():
+                    if any(error_type in line for error_type in valid_error_types):
+                        error = line.split(":", 1)[0]
+                        found_error_type = True
+                        break
+                if not found_error_type:
                     error = "Uncategorized"
 
         output_notebooks.append(uri)

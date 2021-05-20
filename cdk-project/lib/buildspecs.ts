@@ -11,6 +11,8 @@ export function createPullRequestBuildSpec(): codebuild.BuildSpec {
         phases: {
             pre_build: {
                 commands: [
+                    `echo "Starting dockerd"`,
+                    `start-dockerd`,
                     `PR_NUM=$(echo $CODEBUILD_SOURCE_VERSION | grep -o "[0-9]\\+")`,
                     `echo "Running notebooks for PR $PR_NUM"`,
                 ],

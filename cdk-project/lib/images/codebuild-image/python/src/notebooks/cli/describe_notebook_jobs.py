@@ -75,9 +75,11 @@ def main():
                 error = "KernelDied"
             elif error:
                 lines = error.splitlines()
-                error_message = lines[-1]
-                error_type, error_details = error_message.split(":", 1)
-                error = error_type or "Uncategorized"
+                error_message = lines[-1].split(":", 1)
+                if len(error_message) == 2:
+                    error = error_message[0]
+                else:
+                    error = "Uncategorized"
 
         output_notebooks.append(uri)
         runtimes.append(runtime)

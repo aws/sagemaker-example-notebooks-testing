@@ -3,7 +3,7 @@ import argparse
 import os
 import sys
 import time
-from datetime import datetime, timezone
+from datetime import datetime
 
 import pandas as pd
 from notebooks.run import execute_notebook, get_output_notebook, get_output_prefix, upload_notebook
@@ -41,7 +41,7 @@ def main():
     session = ensure_session()
 
     csv_filename = args.csv
-    df = pd.read_csv(csv_filename, index_col=False)
+    dataframe = pd.read_csv(csv_filename, index_col=False)
 
     output_notebooks = []
     runtimes = []
@@ -50,25 +50,26 @@ def main():
     dates = []
 
     sagemaker = session.client("sagemaker")
-    for index, row in df.iterrows():
+    for index, row in dataframe.iterrows():
         job_name = row["processing-job-name"]
         if job_name == "None":
             uri = "None"
             runtime = 0
             status = "Skipped"
             error = "UsesDocker"
-            date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+            date = datetime.utcnow().strftime("%Y-%m-%d")
         else:
             response = sagemaker.describe_processing_job(ProcessingJobName=job_name)
+            date = response.get("ProcessingEndTime", datetime.utcnow()).strftime("%Y-%m-%d")
             notebook, uri = get_output_notebook(job_name, session)
-            runtime = (
-                response.get("ProcessingEndTime", datetime.now(timezone.utc))
-                - response.get("ProcessingStartTime", datetime.now(timezone.utc))
-            ).total_seconds()
             status = response.get("ProcessingJobStatus")
-            date = response.get("ProcessingEndTime", datetime.now(timezone.utc)).strftime(
-                "%Y-%m-%d"
-            )
+
+            runtime = (
+                response.get("ProcessingEndTime", datetime.utcnow())
+                - response.get("ProcessingStartTime", datetime.utcnow())
+            ).total_seconds()
+            if runtime < 0:
+                runtime = 0
 
             error = response.get("ExitMessage")
             if error == "Kernel died":
@@ -97,17 +98,23 @@ def main():
         print(job_name)
         time.sleep(1)
 
-    df["output"] = output_notebooks
-    df["runtime"] = runtimes
-    df["status"] = statuses
-    df["error"] = errors
-
-    df.insert(loc=0, column="date", value=dates)
+    new_dataframe = pd.DataFrame(
+        {
+            "date": dates,
+            "filename": dataframe["notebooks"],
+            "processing-job-name": dataframe["processing-job-name"],
+            "kernel": dataframe["kernel"],
+            "output": output_notebooks,
+            "runtime": runtimes,
+            "status": statuses,
+            "error": errors,
+        }
+    )
 
     print("\n" * 2)
     print("-" * 100)
     print("\n" * 2)
-    print(save_csv_to_s3(df, csv_filename))
+    print(save_csv_to_s3(new_dataframe, csv_filename))
 
 
 if __name__ == "__main__":

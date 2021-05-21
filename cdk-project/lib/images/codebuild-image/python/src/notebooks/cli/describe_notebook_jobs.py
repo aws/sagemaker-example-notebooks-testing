@@ -85,6 +85,9 @@ def main():
                 if not found_error_type:
                     error = "Uncategorized"
 
+            if status == "Stopped":
+                error = "TimedOut"
+
         output_notebooks.append(uri)
         runtimes.append(runtime)
         statuses.append(status)

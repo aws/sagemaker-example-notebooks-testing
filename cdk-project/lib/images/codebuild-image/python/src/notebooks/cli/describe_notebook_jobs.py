@@ -3,7 +3,7 @@ import argparse
 import os
 import sys
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 
 import pandas as pd
 from notebooks.run import execute_notebook, get_output_notebook, get_output_prefix, upload_notebook
@@ -57,16 +57,18 @@ def main():
             runtime = 0
             status = "Skipped"
             error = "UsesDocker"
-            date = datetime.utcnow().strftime("%Y-%m-%d")
+            date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
         else:
             response = sagemaker.describe_processing_job(ProcessingJobName=job_name)
-            date = response.get("ProcessingEndTime", datetime.utcnow()).strftime("%Y-%m-%d")
+            date = response.get("ProcessingEndTime", datetime.now(timezone.utc)).strftime(
+                "%Y-%m-%d"
+            )
             notebook, uri = get_output_notebook(job_name, session)
             status = response.get("ProcessingJobStatus")
 
             runtime = (
-                response.get("ProcessingEndTime", datetime.utcnow())
-                - response.get("ProcessingStartTime", datetime.utcnow())
+                response.get("ProcessingEndTime", datetime.now(timezone.utc))
+                - response.get("ProcessingStartTime", datetime.now(timezone.utc))
             ).total_seconds()
             if runtime < 0:
                 runtime = 0
@@ -101,7 +103,7 @@ def main():
     new_dataframe = pd.DataFrame(
         {
             "date": dates,
-            "filename": dataframe["notebooks"],
+            "filename": dataframe["filename"],
             "processing-job-name": dataframe["processing-job-name"],
             "kernel": dataframe["kernel"],
             "output": output_notebooks,

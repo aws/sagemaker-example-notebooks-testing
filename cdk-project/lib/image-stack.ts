@@ -19,6 +19,7 @@ export class ImageStack extends cdk.Stack {
     readonly basePythonImage: DockerImageAsset;
     readonly dataScienceImage: DockerImageAsset;
     readonly sparkImage: DockerImageAsset;
+    readonly rImage: DockerImageAsset;
 
     readonly mxnetImage: DockerImageAsset;
     readonly pytorchImage: DockerImageAsset;
@@ -47,6 +48,7 @@ export class ImageStack extends cdk.Stack {
             "1.0",
         );
         this.sparkImage = this.createProcessingImageFrom1P("spark", "sagemaker-sparkmagic", "1.0");
+        this.rImage = this.createProcessingImageFrom1P("r", "r-image", "1.0");
 
         this.mxnetImage = this.createProcessingImageFromDlc(
             "mxnet",
@@ -105,7 +107,7 @@ export class ImageStack extends cdk.Stack {
         return this.createProcessingImage(
             name,
             `236514542706.dkr.ecr.us-west-2.amazonaws.com/${baseImageRepository}:${baseImageTag}`,
-            "Dockerfile.1p",
+            "Dockerfile",
         );
     }
 
@@ -117,7 +119,7 @@ export class ImageStack extends cdk.Stack {
         return this.createProcessingImage(
             name,
             `763104351884.dkr.ecr.us-west-2.amazonaws.com/${baseImageRepository}:${baseImageTag}`,
-            "Dockerfile.dlc",
+            "Dockerfile",
         );
     }
 }

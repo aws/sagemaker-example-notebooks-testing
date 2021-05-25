@@ -33,6 +33,7 @@ PYTORCH_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/pytorch@{get_
 TENSORFLOW_1_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/tensorflow-1@{get_latest_image_digest(CI_REGISTRY_ID, 'tensorflow-1')}"
 TENSORFLOW_2_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/tensorflow-2@{get_latest_image_digest(CI_REGISTRY_ID, 'tensorflow-2')}"
 SPARK_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/spark@{get_latest_image_digest(CI_REGISTRY_ID, 'spark')}"
+R_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/r@{get_latest_image_digest(CI_REGISTRY_ID, 'r')}"
 
 
 def kernel_type_for(notebook):
@@ -87,6 +88,8 @@ def kernel_type_for(notebook):
             return "TensorFlow 2"
         elif any(name in kernel_name for name in ("SparkMagic", "PySpark", "pysparkkernel")):
             return "Spark"
+        elif kernel_name == "R":
+            return "R"
 
     return "Data Science"
 
@@ -113,5 +116,7 @@ def kernel_image_for(notebook):
         return TENSORFLOW_2_IMAGE
     elif kernel_type == "Spark":
         return SPARK_IMAGE
+    elif kernel_type == "R":
+        return R_IMAGE
 
     return DATA_SCIENCE_IMAGE

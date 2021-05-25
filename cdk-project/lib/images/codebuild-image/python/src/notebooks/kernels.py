@@ -33,7 +33,7 @@ PYTORCH_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/pytorch@{get_
 TENSORFLOW_1_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/tensorflow-1@{get_latest_image_digest(CI_REGISTRY_ID, 'tensorflow-1')}"
 TENSORFLOW_2_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/tensorflow-2@{get_latest_image_digest(CI_REGISTRY_ID, 'tensorflow-2')}"
 SPARK_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/spark@{get_latest_image_digest(CI_REGISTRY_ID, 'spark')}"
-R_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/r@{get_latest_image_digest(CI_REGISTRY_ID, 'r')}"
+R_IMAGE = f"{CI_REGISTRY_ID}.dkr.ecr.us-west-2.amazonaws.com/r-image@{get_latest_image_digest(CI_REGISTRY_ID, 'r-image')}"
 
 
 def kernel_type_for(notebook):

@@ -48,7 +48,7 @@ export class ImageStack extends cdk.Stack {
             "1.0",
         );
         this.sparkImage = this.createProcessingImageFrom1P("spark", "sagemaker-sparkmagic", "1.0");
-        this.rImage = this.createProcessingImageFrom1P("r", "r-image", "1.0");
+        this.rImage = this.createProcessingImageFrom1P("r-image", "r-image", "1.0");
 
         this.mxnetImage = this.createProcessingImageFromDlc(
             "mxnet",

@@ -1,6 +1,9 @@
 ARG BASE_IMAGE=need_an_image
 FROM $BASE_IMAGE
 
+# there is a bug requiring root to access the directories
+USER root
+
 RUN apt-get update \
     && apt-get -y install \
         apt-transport-https \
@@ -30,6 +33,3 @@ COPY run_notebook execute.py init-script.sh /opt/program/
 RUN bash /opt/program/init-script.sh
 
 ENTRYPOINT ["/bin/bash"]
-
-# there is a bug requiring root to access the directories
-USER root

@@ -6,16 +6,19 @@ import cw = require("@aws-cdk/aws-cloudwatch");
 import events = require("@aws-cdk/aws-events");
 import targets = require("@aws-cdk/aws-events-targets");
 import iam = require("@aws-cdk/aws-iam");
+import lambda = require("@aws-cdk/aws-lambda");
 import s3 = require("@aws-cdk/aws-s3");
 import sam = require("@aws-cdk/aws-sam");
 import stepfunctions = require("@aws-cdk/aws-stepfunctions");
 import changeCase = require("change-case");
 
 import common = require("./common");
+import path = require("path");
 import { BuildSystemStack } from "./build-system-stack";
 import { Duration } from "@aws-cdk/core";
 import { Schedule } from "@aws-cdk/aws-events";
 import { Environments } from "./common";
+import { ManagedPolicy } from "@aws-cdk/aws-iam";
 
 interface ProjectStackProps extends cdk.StackProps {
     project: common.Project;
@@ -231,7 +234,7 @@ export class ProjectStack extends cdk.Stack {
 
         const sourceStage = pipeline.addStage({ stageName: "Source" });
         const projectSource = new cpa.GitHubSourceAction({
-            actionName: "ProjectSource",
+            actionName: "DownloadSource",
             owner: p.owner,
             repo: p.repo,
             branch: p.branch, // default: 'master'
@@ -275,9 +278,9 @@ export class ProjectStack extends cdk.Stack {
 
         const buildOutputArtifact = new cp.Artifact("ARTIFACT_1");
 
-        const buildStage = pipeline.addStage({ stageName: "Build" });
+        const buildStage = pipeline.addStage({ stageName: "Run" });
         const buildAction = new cpa.CodeBuildAction({
-            actionName: "BuildAction",
+            actionName: "RunNotebooks",
             project: buildProject,
             input: sourceOutputArtifact,
             outputs: [buildOutputArtifact],
@@ -288,7 +291,7 @@ export class ProjectStack extends cdk.Stack {
 
         waitStage.addAction(
             new cpa.StepFunctionInvokeAction({
-                actionName: "WaitAction",
+                actionName: "WaitForProcessingJobs",
                 stateMachine: new stepfunctions.StateMachine(this, "WaitStateMachine", {
                     definition: new stepfunctions.Wait(this, "WaitForProcessingJobs", {
                         time: stepfunctions.WaitTime.duration(cdk.Duration.hours(2)),
@@ -297,7 +300,7 @@ export class ProjectStack extends cdk.Stack {
             }),
         );
 
-        const deployStage = pipeline.addStage({ stageName: "Deploy" });
+        const deployStage = pipeline.addStage({ stageName: "Report" });
         const additionalInputArtifacts =
             source === undefined
                 ? [buildOutputArtifact]
@@ -305,12 +308,19 @@ export class ProjectStack extends cdk.Stack {
 
         deployStage.addAction(
             new cpa.CodeBuildAction({
-                actionName: "DeployAction",
+                actionName: "GenerateReport",
                 project: deployProject,
                 input: sourceOutputArtifact,
                 extraInputs: additionalInputArtifacts,
             }),
         );
+
+        const queryStage = pipeline.addStage({ stageName: "Query" });
+        const queryAction = new cpa.LambdaInvokeAction({
+            actionName: "StartAthenaQuery",
+            lambda: this.createAthenaQueryLambda(),
+        });
+        queryStage.addAction(queryAction);
 
         if (p.enableAutomaticRelease) {
             const rule = new events.Rule(this, "ScheduledEvent", {
@@ -318,6 +328,24 @@ export class ProjectStack extends cdk.Stack {
             });
             rule.addTarget(new targets.CodePipeline(pipeline));
         }
+    }
+
+    createAthenaQueryLambda(): lambda.Function {
+        const role = new iam.Role(this, "AthenaQueryRole", {
+            assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com"),
+        });
+
+        role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("AmazonAthenaFullAccess"));
+        role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("CloudWatchFullAccess"));
+
+        return new lambda.Function(this, "AthenaQueryLambda", {
+            description: "Start an Athena query on the full repo scan report",
+            role: role,
+            code: lambda.Code.fromAsset(path.join(__dirname, "../lambda/python-functions")),
+            handler: "athena_query.lambda_handler",
+            runtime: lambda.Runtime.PYTHON_3_6,
+            timeout: Duration.minutes(5),
+        });
     }
 
     createReleaseBuildProject(p: common.Project, pipelineName: string): codebuild.PipelineProject {

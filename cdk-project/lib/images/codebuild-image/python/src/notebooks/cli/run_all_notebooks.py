@@ -62,6 +62,8 @@ def main():
             notebook, ["docker ", 'instance_type = "local"']
         ):
             job_name = None
+        elif parse.skip(notebook):
+            job_name = None
         else:
             image = kernels.kernel_image_for(notebook)
             s3path = upload_notebook(notebook, session)

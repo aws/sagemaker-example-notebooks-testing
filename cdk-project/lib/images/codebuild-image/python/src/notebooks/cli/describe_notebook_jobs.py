@@ -56,7 +56,7 @@ def main():
             uri = "None"
             runtime = 0
             status = "Skipped"
-            error = "UsesDocker"
+            error = None
             date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
         else:
             response = sagemaker.describe_processing_job(ProcessingJobName=job_name)

@@ -5,6 +5,10 @@ from pathlib import Path
 from github import Github
 from notebooks.git import Git
 
+SKIP_LIST = {
+    "ground_truth_labeling_jobs",
+}
+
 
 def all_notebook_filenames():
     """Return all the notebook filenames in the current directory.
@@ -117,3 +121,22 @@ def markdown_cells(notebook):
     with open(notebook) as notebook_file:
         cells = json.load(notebook_file)["cells"]
     return [cell["source"] for cell in cells if cell["cell_type"] == "markdown"]
+
+
+def skip(notebook):
+    """Check whether the notebook should be skipped.
+
+    Args:
+        notebook (Path): The notebook to check whether to skip.
+
+    Returns:
+        bool: True if the notebook should be skipped.
+
+    """
+    directories = Path(notebook).parents
+
+    if notebook in SKIP_LIST:
+        return True
+    elif any([str(directory) in SKIP_LIST for directory in directories]):
+        return True
+    return False

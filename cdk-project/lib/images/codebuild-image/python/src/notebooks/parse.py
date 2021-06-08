@@ -7,6 +7,15 @@ from notebooks.git import Git
 
 SKIP_LIST = {
     "ground_truth_labeling_jobs",
+    "aws_marketplace",
+    "label_data",
+    "contrib",
+    "sagemaker-fundamentals",
+    "end_to_end",
+    "use-cases",
+    "step-functions-data-science-sdk",
+    "prep_data",
+    "ingest_data"
 }
 
 

@@ -15,7 +15,7 @@ SKIP_LIST = {
     "use-cases",
     "step-functions-data-science-sdk",
     "prep_data",
-    "ingest_data"
+    "ingest_data",
 }
 
 

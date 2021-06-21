@@ -16,6 +16,9 @@ SKIP_LIST = {
     "step-functions-data-science-sdk",
     "prep_data",
     "ingest_data",
+    "advanced_functionality/distributed_tensorflow_mask_rcnn", 
+    "sagemaker_edge_manager"
+    
 }
 
 

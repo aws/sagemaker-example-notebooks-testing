@@ -166,7 +166,7 @@ export class ProjectStack extends cdk.Stack {
         const buildSource = codebuild.Source.gitHub({
             owner: p.owner || common.Constants.defaultGitHubOwner,
             repo: p.repo,
-            reportBuildStatus: true,
+            reportBuildStatus: false,
             webhook: true,
         });
 

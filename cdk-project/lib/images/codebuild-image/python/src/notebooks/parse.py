@@ -6,16 +6,18 @@ from github import Github
 from notebooks.git import Git
 
 SKIP_LIST = {
-    "ground_truth_labeling_jobs",
     "aws_marketplace",
-    "label_data",
     "contrib",
-    "sagemaker-fundamentals",
     "end_to_end",
-    "use-cases",
-    "step-functions-data-science-sdk",
-    "prep_data",
+    "ground_truth_labeling_jobs",
     "ingest_data",
+    "label_data",
+    "prep_data",
+    "sagemaker-fundamentals",
+    "sagemaker_edge_manager/sagemaker_edge_example/sagemaker_edge_example.ipynb",
+    "sagemaker_neo_compilation_jobs/gluoncv_yolo/gluoncv_yolo_neo.ipynb",
+    "step-functions-data-science-sdk",
+    "use-cases",
 }
 
 

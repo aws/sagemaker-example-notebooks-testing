@@ -6,6 +6,7 @@ from github import Github
 from notebooks.git import Git
 
 SKIP_LIST = {
+    "advanced_functionality/distributed_tensorflow_mask_rcnn", 
     "aws_marketplace",
     "contrib",
     "end_to_end",
@@ -14,12 +15,11 @@ SKIP_LIST = {
     "label_data",
     "prep_data",
     "sagemaker-fundamentals",
-    "sagemaker_edge_manager/sagemaker_edge_example/sagemaker_edge_example.ipynb",
+    "sagemaker_edge_manager"
     "sagemaker_neo_compilation_jobs/gluoncv_yolo/gluoncv_yolo_neo.ipynb",
     "step-functions-data-science-sdk",
     "use-cases",
 }
-
 
 def all_notebook_filenames():
     """Return all the notebook filenames in the current directory.

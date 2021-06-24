@@ -68,7 +68,10 @@ export function createFullRepoScanBuildSpec(): codebuild.BuildSpec {
         },
         phases: {
             build: {
-                commands: ["run-all-notebooks --instance $INSTANCE_TYPE"],
+                commands: [
+                    `find reinforcement_learning/*/common -maxdepth 0 -type f | xargs -I R1 sh -c "cat R1 | xargs -I R2 ln -sf R2 R1"`,
+                    `run-all-notebooks --instance $INSTANCE_TYPE`,
+                ],
             },
         },
         artifacts: {

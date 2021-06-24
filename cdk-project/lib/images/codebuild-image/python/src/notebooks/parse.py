@@ -15,7 +15,7 @@ SKIP_LIST = {
     "label_data",
     "prep_data",
     "sagemaker-fundamentals",
-    "sagemaker_edge_manager"
+    "sagemaker_edge_manager",
     "sagemaker_neo_compilation_jobs/gluoncv_yolo/gluoncv_yolo_neo.ipynb",
     "step-functions-data-science-sdk",
     "use-cases",
@@ -146,7 +146,7 @@ def skip(notebook):
     """
     directories = Path(notebook).parents
 
-    if notebook in SKIP_LIST:
+    if str(notebook) in SKIP_LIST:
         return True
     elif any([str(directory) in SKIP_LIST for directory in directories]):
         return True

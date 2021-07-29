@@ -446,6 +446,16 @@ allow_list = {
     "Explainability",
     "libsvm",
     "protobuf",
+    "MNIST",
+    "DeepAR",
+    "RegisterModelStep",
+    "TuningStep",
+    "ModelName",
+    "ModelPackageName",
+    "ModelPackageGroupName",
+    "CreateModel",
+    "HPO",
+    "featurized"
 }
 
 rules_to_ignore = {

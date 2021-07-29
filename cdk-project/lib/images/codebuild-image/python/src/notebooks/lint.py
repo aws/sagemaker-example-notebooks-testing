@@ -32,6 +32,10 @@ def check_grammar(notebook):
             code_substituted_line = re.sub(
                 "(`)\1{2,}[^`]*(`)\1{2,}|`[^`]*`", "[code]", stripped_line
             )
+            # Strip down any anchor tags or URL markdown from the text before proceeding
+            code_substituted_line = re.sub('<a.*?>|</a>', '', code_substituted_line)
+            code_substituted_line = re.sub(r'\[(.*?)\]\((.*?)\)',r'\1',code_substituted_line)
+
             matches = tool.check(code_substituted_line)
             report.extend(matches)
 

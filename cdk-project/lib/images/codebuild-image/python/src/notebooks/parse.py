@@ -15,6 +15,7 @@ SKIP_LIST = {
     "label_data",
     "prep_data",
     "sagemaker-fundamentals",
+    "sagemaker-pipelines/tabular/lambda-step/sagemaker-pipelines-lambda-step.ipynb",
     "sagemaker_edge_manager",
     "sagemaker_neo_compilation_jobs/gluoncv_yolo/gluoncv_yolo_neo.ipynb",
     "step-functions-data-science-sdk",

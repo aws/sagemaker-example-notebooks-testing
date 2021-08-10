@@ -30,6 +30,11 @@ export const projects: Project[] = [
                 pullRequestBuildSpec: buildspecs.createGrammarBuildSpec(),
                 computeType: codebuild.ComputeType.LARGE,
             }),
+            new Build({
+                name: "sagemaker-examples-link-check",
+                pullRequestBuildSpec: buildspecs.createLinkCheckBuildSpec(),
+                computeType: codebuild.ComputeType.LARGE,
+            }),
         ],
     }),
 

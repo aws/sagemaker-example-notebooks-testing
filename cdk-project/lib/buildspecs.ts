@@ -58,6 +58,23 @@ export function createGrammarBuildSpec(): codebuild.BuildSpec {
     });
 }
 
+export function createLinkCheckBuildSpec(): codebuild.BuildSpec {
+    return codebuild.BuildSpec.fromObject({
+        version: "0.2",
+        phases: {
+            pre_build: {
+                commands: [
+                    `PR_NUM=$(echo $CODEBUILD_SOURCE_VERSION | grep -o "[0-9]\\+")`,
+                    `echo "Checking presence of broken links for deleted files (if any) for PR $PR_NUM"`,
+                ],
+            },
+            build: {
+                commands: ["check-pr-broken-links --pr $PR_NUM"],
+            },
+        },
+    });
+}
+
 export function createFullRepoScanBuildSpec(): codebuild.BuildSpec {
     return codebuild.BuildSpec.fromObject({
         version: "0.2",

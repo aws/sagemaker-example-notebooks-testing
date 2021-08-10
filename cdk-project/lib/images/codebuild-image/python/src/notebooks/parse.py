@@ -99,17 +99,14 @@ def check_file_references(name):
     for root, dirs, files in walk(Path(".")):
         for file_name in files:
             if is_notebook(file_name):
-                with open(os.path.join(root, file_name)) as notebook_file:
-                    cells = json.load(notebook_file)["cells"]
-                    markdown_cells = [cell["source"] for cell in cells if cell["cell_type"] == "markdown"]
-                    for cell in markdown_cells:
-                        for line in cell:
-                            if name in line:
-                                references.append(file_name)
-
+                nb_markdown_cells = markdown_cells(os.path.join(root, file_name))
+                for cell in nb_markdown_cells:
+                    for line in cell:
+                        if name in line:
+                            references.append(file_name)
             else:
-                with open(os.path.join(root, file_name), encoding="utf8", errors='ignore') as myfile:
-                    if name in myfile.read():
+                with open(os.path.join(root, file_name), encoding="utf8", errors='ignore') as non_nb_file:
+                    if name in non_nb_file.read():
                         references.append(file_name)
     return references
 

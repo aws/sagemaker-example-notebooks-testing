@@ -455,7 +455,10 @@ allow_list = {
     "ModelPackageGroupName",
     "CreateModel",
     "HPO",
-    "featurized"
+    "featurized",
+    "Chainer",
+    "dataframe",
+    "logit"
 }
 
 rules_to_ignore = {

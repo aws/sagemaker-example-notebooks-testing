@@ -1,7 +1,7 @@
 import json
 import os
 from pathlib import Path
-
+from os import walk
 from github import Github
 from notebooks.git import Git
 
@@ -32,6 +32,22 @@ def all_notebook_filenames():
     return [str(filename) for filename in Path(".").rglob("*.ipynb")]
 
 
+def get_pr_files(pr_num):
+    """Return all the files in a given GitHub pull request.
+
+    Args:
+        pr_num: The pull request number.
+
+    Returns:
+        [File]: A list of File objects for all the files in the PR.
+
+    """
+    g = Github(Git().oauth_token)
+    repo = g.get_repo("aws/amazon-sagemaker-examples")
+    pr = repo.get_pull(pr_num)
+    return pr.get_files()
+
+
 def pr_notebook_filenames(pr_num):
     """Return all the notebook filenames in a given GitHub pull request.
 
@@ -42,11 +58,58 @@ def pr_notebook_filenames(pr_num):
         [str]: A list of strings containing paths to notebooks in the PR.
 
     """
-    g = Github(Git().oauth_token)
-    repo = g.get_repo("aws/amazon-sagemaker-examples")
-    pr = repo.get_pull(pr_num)
-    return filter(is_notebook, [file.filename for file in pr.get_files()])
+    return filter(is_notebook, [file.filename for file in get_pr_files(pr_num)])
 
+
+def get_deleted_files(pr_num):
+    """Return all the deleted files in a given GitHub pull request.
+
+    Args:
+        pr_num: The pull request number.
+
+    Returns:
+        [str]: A list of strings containing names of the deleted notebooks in the PR.
+
+    """
+
+    return filter(is_deleted, [file for file in get_pr_files(pr_num)])
+
+def is_deleted(file):
+    """Check whether a given file is in a removed or deleted state.
+
+    Args:
+        filename: The filename to check.
+
+    Returns:
+        bool: Whether the given file has been removed or not.
+
+    """
+    return file.status == 'removed'
+
+def check_file_references(name):
+    """Check whether a given file is referenced in the repo
+
+    Args:
+        filename: The filename to check.
+
+    Returns:
+        bool: Whether the given file has been refereenced in the repo or not.
+
+    """
+    references = []
+    for root, dirs, files in walk(Path(".")):
+        for file_name in files:
+            if is_notebook(file_name):
+                nb_markdown_cells = markdown_cells(os.path.join(root, file_name))
+                for cell in nb_markdown_cells:
+                    for line in cell:
+                        if name in line:
+                            references.append(file_name)
+            else:
+                with open(os.path.join(root, file_name), encoding="utf8", errors='ignore') as non_nb_file:
+                    if name in non_nb_file.read():
+                        references.append(file_name)
+    return references
 
 def is_notebook(filename):
     """Check whether a given file is a Jupyter notebook.

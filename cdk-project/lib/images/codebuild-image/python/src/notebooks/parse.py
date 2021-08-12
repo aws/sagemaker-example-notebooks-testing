@@ -16,6 +16,7 @@ SKIP_LIST = {
     "prep_data",
     "sagemaker-fundamentals",
     "sagemaker-pipelines/tabular/lambda-step/sagemaker-pipelines-lambda-step.ipynb",
+    "sagemaker-pipelines/tabular/tensorflow2-california-housing-sagemaker-pipelines-deploy-endpoint/tensorflow2-california-housing-sagemaker-pipelines-deploy-endpoint.ipynb",
     "sagemaker_edge_manager",
     "sagemaker_neo_compilation_jobs/gluoncv_yolo/gluoncv_yolo_neo.ipynb",
     "step-functions-data-science-sdk",

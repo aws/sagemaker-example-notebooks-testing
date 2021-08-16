@@ -1,4 +1,7 @@
 #!/bin/bash
 
 #python3 -u /opt/program/execute.py 2>&1 | stdbuf -o0 tr '\r' '\n'
+#Expose default python execution environment to jupyter
+python3 -m ipykernel install --user --name base-env
+
 python3 /opt/program/execute.py

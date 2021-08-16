@@ -65,6 +65,7 @@ def run_notebook():
         if not kernel:
             nb_kernel = kernel_for(notebook_file)
             avail_kernels = available_kernels()
+            print("available kernels are ", avail_kernels)
             if nb_kernel is None or nb_kernel not in avail_kernels:
                 kernel = avail_kernels[0]
             else:

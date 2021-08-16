@@ -48,6 +48,7 @@ def main():
     statuses = []
     errors = []
     dates = []
+    error_details= []
 
     sagemaker = session.client("sagemaker")
     for index, row in dataframe.iterrows():
@@ -82,7 +83,9 @@ def main():
                 lines = error.splitlines()
                 for line in reversed(lines):
                     if any(error_type in line for error_type in valid_error_types):
-                        error = line.split(":", 1)[0]
+                        error_parsed = line.split(":", 1)
+                        error = error_parsed[0]
+                        detail = error_parsed[1]
                         found_error_type = True
                         break
                 if not found_error_type:
@@ -96,6 +99,7 @@ def main():
         statuses.append(status)
         errors.append(error)
         dates.append(date)
+        error_details.append(detail)
 
         print(job_name)
         time.sleep(1)
@@ -110,6 +114,7 @@ def main():
             "runtime": runtimes,
             "status": statuses,
             "error": errors,
+            "error_detail": error_details
         }
     )
 

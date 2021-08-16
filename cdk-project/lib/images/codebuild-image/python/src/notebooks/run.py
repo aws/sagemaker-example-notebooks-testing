@@ -242,7 +242,6 @@ def execute_notebook(
 
     api_args["Environment"]["PAPERMILL_INPUT"] = local_input
     api_args["Environment"]["PAPERMILL_OUTPUT"] = local_output + result
-    api_args["Environment"]["PAPERMILL_kernel"] = local_output + result
     if os.environ.get("AWS_DEFAULT_REGION") != None:
         api_args["Environment"]["AWS_DEFAULT_REGION"] = os.environ["AWS_DEFAULT_REGION"]
     api_args["Environment"]["PAPERMILL_PARAMS"] = json.dumps(parameters)

@@ -65,9 +65,13 @@ def run_notebook():
         if not kernel:
             nb_kernel = kernel_for(notebook_file)
             avail_kernels = available_kernels()
+            print("The kernel found in the notebook metadata is: ", nb_kernel)
+            print("The kernels available to execute within jupyter are kernels are: ", ','.join(avail_kernels))
             if nb_kernel is None or nb_kernel not in avail_kernels:
+                print("No default notebook kernel found or it is not available in the execution environment, picking from available kernels")
                 kernel = avail_kernels[0]
             else:
+                print("Using notebook provided kernel: ", nb_kernel)
                 kernel = nb_kernel
 
         print(

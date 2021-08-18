@@ -53,6 +53,7 @@ def main():
     sagemaker = session.client("sagemaker")
     for index, row in dataframe.iterrows():
         job_name = row["processing-job-name"]
+        detail = None
         if job_name == "None":
             uri = "None"
             runtime = 0
@@ -77,6 +78,7 @@ def main():
             error = response.get("ExitMessage")
             if error == "Kernel died":
                 error = "KernelDied"
+                detail = "kernel died"
             elif error:
                 found_error_type = False
                 valid_error_types = ("Exception:", "Error:", "InvalidArn:", "NotFound:", "InUse:")
@@ -84,6 +86,8 @@ def main():
                 for line in reversed(lines):
                     if any(error_type in line for error_type in valid_error_types):
                         error_parsed = line.split(":", 1)
+                        print("The following error was encountered while executing the notebook")
+                        print(line)
                         error = error_parsed[0]
                         detail = error_parsed[1]
                         found_error_type = True
@@ -93,6 +97,7 @@ def main():
 
             if status == "Stopped":
                 error = "TimedOut"
+                detail = "Notebook execution timed out"
 
         output_notebooks.append(uri)
         runtimes.append(runtime)

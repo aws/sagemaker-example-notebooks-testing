@@ -148,6 +148,11 @@ def kernel_for(notebook):
     return None
 
 
+def all_cells(notebook):
+    with open(notebook) as notebook_file:
+        cells = json.load(notebook_file)["cells"]
+    return cells
+
 def code_cells(notebook):
     """Get a list of all the code cells in a given notebook.
 
@@ -158,8 +163,8 @@ def code_cells(notebook):
         [[str]]: A list of code cells. Each code cell is a list of lines of code.
 
     """
-    with open(notebook) as notebook_file:
-        cells = json.load(notebook_file)["cells"]
+
+    cells = all_cells(notebook)
     return [cell["source"] for cell in cells if cell["cell_type"] == "code"]
 
 
@@ -174,7 +179,7 @@ def contains_code(notebook, snippets):
         bool: Whether any of the code snippets exist in the notebook's code cells.
 
     """
-    cells = code_cells(notebook)
+    cells = all_cells(notebook)
 
     for cell in cells:
         for line in cell:
@@ -194,8 +199,7 @@ def markdown_cells(notebook):
         [[str]]: A list of Markdown cells. Each code cell is a list of lines of text.
 
     """
-    with open(notebook) as notebook_file:
-        cells = json.load(notebook_file)["cells"]
+    cells = all_cells(notebook)
     return [cell["source"] for cell in cells if cell["cell_type"] == "markdown"]
 
 

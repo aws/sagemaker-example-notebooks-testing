@@ -23,16 +23,12 @@ def main():
     reference_details = {}
 
     for notebook in parse.get_deleted_files(args.pr):
+        print(f"Checking for {notebook}")
         deleted_references = parse.check_file_references(notebook)
         if deleted_references:
             reference_details[notebook] = deleted_references
-            basename = os.path.basename(notebook)
-            print("\n" * 2)
-            print(f"* {basename} " + "*" * (97 - len(basename)))
             print(f'The defaulting filenames are{" ".join(deleted_references)}')
 
-    print("\n" * 2)
-    print("-" * 100)
     if reference_details:
         raise Exception(
             "One or more notebooks did not pass the link check. Please see above for error messages."

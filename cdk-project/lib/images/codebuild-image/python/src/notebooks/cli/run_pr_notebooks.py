@@ -28,9 +28,9 @@ def parse_args(args):
         required=False,
     )
     parser.add_argument(
-        "--skip-fsx",
+        "--skip-filesystem",
         default=True,
-        help="Skip notebooks that use FSx file system",
+        help="Skip notebooks that use FSx and EFS file systems",
         type=bool,
         required=False,
     )

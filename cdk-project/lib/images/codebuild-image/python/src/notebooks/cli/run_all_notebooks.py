@@ -21,6 +21,13 @@ def parse_args(args):
         type=bool,
         required=False,
     )
+    parser.add_argument(
+        "--skip-fsx",
+        default=True,
+        help="Skip notebooks that use FSx file system",
+        type=bool,
+        required=False,
+    )
 
     parsed = parser.parse_args(args)
 
@@ -60,6 +67,10 @@ def main():
     for notebook in notebook_names:
         if args.skip_docker and parse.contains_code(
             notebook, ["docker ", 'instance_type = "local"', "docker-compose ", "Docker "]
+        ):
+            job_name = None
+        elif args.skip_fsx and parse.contains_code(
+            notebook, ['"FSxLustre"']
         ):
             job_name = None
         elif parse.skip(notebook):

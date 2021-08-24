@@ -181,9 +181,10 @@ def contains_code(notebook, snippets):
 
     """
     cells = all_cells(notebook)
+    source = [cell["source"] for cell in cells]
 
-    for cell in cells:
-        for line in cell:
+    for cell_source in source:
+        for line in cell_source:
             if any(snippet in line for snippet in snippets):
                 return True
 

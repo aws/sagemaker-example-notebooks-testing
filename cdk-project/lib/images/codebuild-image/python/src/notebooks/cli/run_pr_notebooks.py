@@ -51,7 +51,7 @@ def main():
     instance_type = args.instance or "ml.m5.xlarge"
     for notebook in parse.pr_notebook_filenames(args.pr):
         if args.skip_docker and parse.contains_code(
-            notebook, ["docker ", 'instance_type = "local"']
+            notebook, ["docker ", 'instance_type = "local"', 'instance_type="local"', "docker-compose ", "Docker "]
         ):
             job_name = None
         elif parse.skip(notebook):

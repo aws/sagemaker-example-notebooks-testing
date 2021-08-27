@@ -14,7 +14,7 @@ SKIP_LIST = {
     "ingest_data",
     "label_data",
     "prep_data",
-    "async-inference/Async-Inference-Walkthrough.ipynb"
+    "async-inference",
     "sagemaker-fundamentals",
     "sagemaker-pipelines/tabular/lambda-step/sagemaker-pipelines-lambda-step.ipynb",
     "sagemaker-pipelines/tabular/tensorflow2-california-housing-sagemaker-pipelines-deploy-endpoint/tensorflow2-california-housing-sagemaker-pipelines-deploy-endpoint.ipynb",

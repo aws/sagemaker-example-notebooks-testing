@@ -15,6 +15,7 @@ SKIP_LIST = {
     "label_data",
     "prep_data",
     "async-inference",
+    "reinforcement_learning/bandits_statlog_vw_customEnv/bandits_statlog_vw_customEnv.ipynb",
     "sagemaker-fundamentals",
     "sagemaker-pipelines/tabular/lambda-step/sagemaker-pipelines-lambda-step.ipynb",
     "sagemaker-pipelines/tabular/tensorflow2-california-housing-sagemaker-pipelines-deploy-endpoint/tensorflow2-california-housing-sagemaker-pipelines-deploy-endpoint.ipynb",

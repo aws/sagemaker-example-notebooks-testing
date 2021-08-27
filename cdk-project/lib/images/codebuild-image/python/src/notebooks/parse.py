@@ -23,6 +23,7 @@ SKIP_LIST = {
     "sagemaker_edge_manager",
     "sagemaker_neo_compilation_jobs/gluoncv_yolo/gluoncv_yolo_neo.ipynb",
     "step-functions-data-science-sdk",
+    "training/distributed_training/pytorch/data_parallel/rnnt/RNNT_notebook.ipynb",
     "use-cases",
 }
 

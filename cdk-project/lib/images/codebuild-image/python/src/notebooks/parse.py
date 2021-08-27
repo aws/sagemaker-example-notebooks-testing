@@ -7,6 +7,7 @@ from notebooks.git import Git
 
 SKIP_LIST = {
     "advanced_functionality/distributed_tensorflow_mask_rcnn", 
+    "advanced_functionality/multi_model_linear_learner_home_value/linear_learner_multi_model_endpoint_inf_pipeline.ipynb",
     "aws_marketplace",
     "contrib",
     "end_to_end",
@@ -14,6 +15,7 @@ SKIP_LIST = {
     "ingest_data",
     "label_data",
     "prep_data",
+    "reinforcement_learning/bandits_statlog_vw_customEnv/bandits_statlog_vw_customEnv.ipynb",
     "async-inference/Async-Inference-Walkthrough.ipynb"
     "sagemaker-fundamentals",
     "sagemaker-pipelines/tabular/lambda-step/sagemaker-pipelines-lambda-step.ipynb",

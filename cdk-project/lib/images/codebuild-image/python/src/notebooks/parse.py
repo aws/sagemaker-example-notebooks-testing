@@ -15,6 +15,7 @@ SKIP_LIST = {
     "ingest_data",
     "label_data",
     "prep_data",
+    "async-inference",
     "patterns/ml_gateway/ml-gateway.ipynb",
     "reinforcement_learning/bandits_statlog_vw_customEnv/bandits_statlog_vw_customEnv.ipynb",
     "sagemaker-fundamentals",

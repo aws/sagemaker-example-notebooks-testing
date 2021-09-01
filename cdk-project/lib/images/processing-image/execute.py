@@ -21,7 +21,8 @@ import sys
 import traceback
 from urllib.parse import urlparse
 from urllib.request import urlopen
-
+from random import randint
+from time import sleep
 import boto3
 import botocore
 import jupyter_client.kernelspec as kernelspec
@@ -40,6 +41,10 @@ def run_notebook():
 
         notebook_dir = os.path.dirname(notebook)
         notebook_file = os.path.basename(notebook)
+
+        pause = randint(5,10)
+        print("Waiting {} seconds....".format(pause))
+        sleep(pause)
 
         # If the user specified notebook path in S3, run with that path.
         if notebook.startswith("s3://"):

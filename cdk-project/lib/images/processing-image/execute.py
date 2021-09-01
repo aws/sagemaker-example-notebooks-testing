@@ -42,7 +42,7 @@ def run_notebook():
         notebook_dir = os.path.dirname(notebook)
         notebook_file = os.path.basename(notebook)
 
-        pause = randint(5,10)
+        pause = randint(1,10)
         print("Waiting {} seconds....".format(pause))
         sleep(pause)
 

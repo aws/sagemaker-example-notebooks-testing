@@ -22,6 +22,13 @@ def parse_args(args):
         required=False,
     )
     parser.add_argument(
+        "--skip-localmode",
+        default=True,
+        help="Skip notebooks that use Local Mode",
+        type=bool,
+        required=False,
+    )
+    parser.add_argument(
         "--skip-filesystem",
         default=True,
         help="Skip notebooks that use FSx and EFS file systems",
@@ -58,20 +65,19 @@ def save_csv_to_s3(notebooks, job_names, kernels):
 def main():
     args = parse_args(sys.argv[1:])
 
-    notebook_names = parse.all_notebook_filenames()
+    # notebook_names = parse.all_notebook_filenames()
+    notebook_names = parse.get_lm_optional_nb_names()
     job_names = []
     kernel_names = []
 
     session = ensure_session()
     instance_type = args.instance or "ml.m5.xlarge"
     for notebook in notebook_names:
-        if args.skip_docker and parse.contains_code(
-            notebook, ["docker ", 'instance_type = "local"', 'instance_type="local"', "docker-compose ", "Docker "]
-        ):
+        if args.skip_docker and parse.uses_docker(notebook):
             job_name = None
-        elif args.skip_filesystem and parse.contains_code(
-            notebook, ['"FSxLustre"', "'FSxLustre'", '"EFS"', "'EFS'"]
-        ):
+        elif args.skip_localmode and parse.local_mode_mandatory(notebook):
+            job_name = None
+        elif args.skip_filesystem and parse.uses_fsx(notebook):
             job_name = None
         elif parse.skip(notebook):
             job_name = None
@@ -90,6 +96,7 @@ def main():
             )
             time.sleep(1)
 
+        print(f"Notebook is.....{notebook}")
         print(job_name)
         job_names.append(str(job_name))
         kernel_names.append(kernels.kernel_type_for(notebook))

@@ -5,8 +5,9 @@ from os import walk
 from github import Github
 from notebooks.git import Git
 
+# List of notebooks and directories skipped by the CI currently
 SKIP_LIST = {
-    "advanced_functionality/distributed_tensorflow_mask_rcnn", 
+    "advanced_functionality/distributed_tensorflow_mask_rcnn",
     "advanced_functionality/multi_model_linear_learner_home_value/linear_learner_multi_model_endpoint_inf_pipeline.ipynb",
     "aws_marketplace",
     "contrib",
@@ -27,6 +28,27 @@ SKIP_LIST = {
     "training/distributed_training/pytorch/data_parallel/rnnt/RNNT_notebook.ipynb",
     "use-cases",
 }
+
+# List of notebooks that use Local Mode, but optionally, and can be run on the CI in "SageMaker Mode"
+LOCAL_MODE_OPTIONAL_LIST = [
+    "reinforcement_learning/rl_mountain_car_coach_gymEnv/rl_mountain_car_coach_gymEnv.ipynb",
+    "reinforcement_learning/rl_resource_allocation_ray_customEnv/rl_news_vendor_ray_custom.ipynb",
+    "reinforcement_learning/rl_resource_allocation_ray_customEnv/rl_bin_packing_ray_custom.ipynb",
+    "reinforcement_learning/rl_resource_allocation_ray_customEnv/rl_vehicle_routing_problem_ray_custom.ipynb"
+    "reinforcement_learning/rl_managed_spot_cartpole_coach/rl_managed_spot_cartpole_coach_gymEnv.ipynb",
+    "reinforcement_learning/rl_portfolio_management_coach_customEnv/rl_portfolio_management_coach_customEnv.ipynb",
+    "reinforcement_learning/rl_predictive_autoscaling_coach_customEnv/rl_predictive_autoscaling_coach_customEnv.ipynb",
+    "reinforcement_learning/rl_stock_trading_coach_customEnv/rl_stock_trading_coach_customEnv.ipynb",
+    "reinforcement_learning/rl_cartpole_coach/rl_cartpole_coach_gymEnv.ipynb",
+    "frameworks/mxnet/get_started_mnist_deploy.ipynb",
+    "frameworks/tensorflow/get_started_mnist_deploy.ipynb",
+    "frameworks/pytorch/get_started_mnist_train.ipynb",
+    "frameworks/mxnet/get_started_mnist_train.ipynb",
+    "frameworks/tensorflow/get_started_mnist_train.ipynb"
+]
+
+def get_lm_optional_nb_names():
+    return LOCAL_MODE_OPTIONAL_LIST
 
 def all_notebook_filenames():
     """Return all the notebook filenames in the current directory.
@@ -80,6 +102,7 @@ def get_deleted_files(pr_num):
 
     return filter(is_deleted, [file for file in get_pr_files(pr_num)])
 
+
 def is_deleted(file):
     """Check whether a given file is in a removed or deleted state.
 
@@ -91,6 +114,7 @@ def is_deleted(file):
 
     """
     return file.status == 'removed'
+
 
 def check_file_references(name):
     """Check whether a given file is referenced in the repo
@@ -116,6 +140,7 @@ def check_file_references(name):
                     if name in non_nb_file.read():
                         references.append(file_name)
     return references
+
 
 def is_notebook(filename):
     """Check whether a given file is a Jupyter notebook.
@@ -157,6 +182,7 @@ def all_cells(notebook):
     with open(notebook) as notebook_file:
         cells = json.load(notebook_file)["cells"]
     return cells
+
 
 def code_cells(notebook):
     """Get a list of all the code cells in a given notebook.
@@ -225,3 +251,22 @@ def skip(notebook):
     elif any([str(directory) in SKIP_LIST for directory in directories]):
         return True
     return False
+
+
+def uses_docker(notebook):
+    return contains_code(
+        notebook, ["docker ", "docker-compose ", "Docker "]
+    )
+
+
+def local_mode_mandatory(notebook):
+    return (
+            (str(notebook) not in LOCAL_MODE_OPTIONAL_LIST) and
+            (contains_code(notebook, ['instance_type = "local"', 'instance_type="local"']))
+    )
+
+
+def uses_fsx(notebook):
+    return contains_code(
+        notebook, ['"FSxLustre"', "'FSxLustre'", '"EFS"', "'EFS'"]
+    )

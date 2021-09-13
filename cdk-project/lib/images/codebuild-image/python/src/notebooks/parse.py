@@ -29,7 +29,9 @@ SKIP_LIST = {
     "use-cases",
 }
 
-# List of notebooks that use Local Mode, but optionally, and can be run on the CI in "SageMaker Mode"
+# Not all notebooks can run on local_mode as well as SageMaker mode.
+# This is a list of some notebooks that use Local Mode, but optionally, and can be run on the CI in "SageMaker Mode"
+# Such notebooks have local_mode usage set to False by default.
 LOCAL_MODE_OPTIONAL_LIST = [
     "reinforcement_learning/rl_mountain_car_coach_gymEnv/rl_mountain_car_coach_gymEnv.ipynb",
     "reinforcement_learning/rl_resource_allocation_ray_customEnv/rl_news_vendor_ray_custom.ipynb",
@@ -181,7 +183,6 @@ def all_cells(notebook):
         cells = json.load(notebook_file)["cells"]
     return cells
 
-
 def code_cells(notebook):
     """Get a list of all the code cells in a given notebook.
 
@@ -252,12 +253,30 @@ def skip(notebook):
 
 
 def uses_docker(notebook):
+    """Check whether the notebook should be skipped because it uses docker based functionality.
+
+    Args:
+        notebook (Path): The notebook to check.
+
+    Returns:
+        bool: True if the notebook uses docker.
+
+    """
     return contains_code(
         notebook, ["docker ", "docker-compose ", "Docker "]
     )
 
 
 def local_mode_mandatory(notebook):
+    """Check whether the notebook should be skipped because runs only in Local Mode
+
+    Args:
+        notebook (Path): The notebook to check.
+
+    Returns:
+        bool: True if local mode is mandatory.
+
+    """
     return (
             (str(notebook) not in LOCAL_MODE_OPTIONAL_LIST) and
             (contains_code(notebook, ['instance_type = "local"', 'instance_type="local"']))
@@ -265,6 +284,15 @@ def local_mode_mandatory(notebook):
 
 
 def uses_fsx(notebook):
+    """Check whether the notebook should be skipped because it uses FXS, FSxLustre or EFS.
+
+    Args:
+        notebook (Path): The notebook to check.
+
+    Returns:
+        bool: True if the notebook uses FSX, FSxLustre or EFS.
+
+    """
     return contains_code(
         notebook, ['"FSxLustre"', "'FSxLustre'", '"EFS"', "'EFS'"]
     )

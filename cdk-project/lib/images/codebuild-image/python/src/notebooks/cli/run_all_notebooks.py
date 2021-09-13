@@ -65,8 +65,7 @@ def save_csv_to_s3(notebooks, job_names, kernels):
 def main():
     args = parse_args(sys.argv[1:])
 
-    # notebook_names = parse.all_notebook_filenames()
-    notebook_names = parse.get_lm_optional_nb_names()
+    notebook_names = parse.all_notebook_filenames()
     job_names = []
     kernel_names = []
 

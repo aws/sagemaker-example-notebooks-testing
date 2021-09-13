@@ -34,14 +34,12 @@ LOCAL_MODE_OPTIONAL_LIST = [
     "reinforcement_learning/rl_mountain_car_coach_gymEnv/rl_mountain_car_coach_gymEnv.ipynb",
     "reinforcement_learning/rl_resource_allocation_ray_customEnv/rl_news_vendor_ray_custom.ipynb",
     "reinforcement_learning/rl_resource_allocation_ray_customEnv/rl_bin_packing_ray_custom.ipynb",
-    "reinforcement_learning/rl_resource_allocation_ray_customEnv/rl_vehicle_routing_problem_ray_custom.ipynb"
+    "reinforcement_learning/rl_resource_allocation_ray_customEnv/rl_vehicle_routing_problem_ray_custom.ipynb",
     "reinforcement_learning/rl_managed_spot_cartpole_coach/rl_managed_spot_cartpole_coach_gymEnv.ipynb",
     "reinforcement_learning/rl_portfolio_management_coach_customEnv/rl_portfolio_management_coach_customEnv.ipynb",
     "reinforcement_learning/rl_predictive_autoscaling_coach_customEnv/rl_predictive_autoscaling_coach_customEnv.ipynb",
     "reinforcement_learning/rl_stock_trading_coach_customEnv/rl_stock_trading_coach_customEnv.ipynb",
     "reinforcement_learning/rl_cartpole_coach/rl_cartpole_coach_gymEnv.ipynb",
-    "frameworks/mxnet/get_started_mnist_deploy.ipynb",
-    "frameworks/tensorflow/get_started_mnist_deploy.ipynb",
     "frameworks/pytorch/get_started_mnist_train.ipynb",
     "frameworks/mxnet/get_started_mnist_train.ipynb",
     "frameworks/tensorflow/get_started_mnist_train.ipynb"

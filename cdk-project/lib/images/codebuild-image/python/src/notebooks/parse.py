@@ -102,7 +102,6 @@ def get_deleted_files(pr_num):
 
     return filter(is_deleted, [file for file in get_pr_files(pr_num)])
 
-
 def is_deleted(file):
     """Check whether a given file is in a removed or deleted state.
 
@@ -114,7 +113,6 @@ def is_deleted(file):
 
     """
     return file.status == 'removed'
-
 
 def check_file_references(name):
     """Check whether a given file is referenced in the repo
@@ -140,7 +138,6 @@ def check_file_references(name):
                     if name in non_nb_file.read():
                         references.append(file_name)
     return references
-
 
 def is_notebook(filename):
     """Check whether a given file is a Jupyter notebook.
@@ -197,7 +194,6 @@ def code_cells(notebook):
     cells = all_cells(notebook)
     return [cell["source"] for cell in cells if cell["cell_type"] == "code"]
 
-
 def contains_code(notebook, snippets):
     """Check whether a notebook contains any of a list of code snippets in any of its code cells.
 
@@ -218,7 +214,6 @@ def contains_code(notebook, snippets):
 
     return False
 
-
 def markdown_cells(notebook):
     """Get a list of all the Markdown cells in a given notebook.
 
@@ -231,7 +226,6 @@ def markdown_cells(notebook):
     """
     cells = all_cells(notebook)
     return [cell["source"] for cell in cells if cell["cell_type"] == "markdown"]
-
 
 def skip(notebook):
     """Check whether the notebook should be skipped.
@@ -251,7 +245,6 @@ def skip(notebook):
         return True
     return False
 
-
 def uses_docker(notebook):
     """Check whether the notebook should be skipped because it uses docker based functionality.
 
@@ -265,7 +258,6 @@ def uses_docker(notebook):
     return contains_code(
         notebook, ["docker ", "docker-compose ", "Docker "]
     )
-
 
 def local_mode_mandatory(notebook):
     """Check whether the notebook should be skipped because runs only in Local Mode
@@ -281,7 +273,6 @@ def local_mode_mandatory(notebook):
             (str(notebook) not in LOCAL_MODE_OPTIONAL_LIST) and
             (contains_code(notebook, ['instance_type = "local"', 'instance_type="local"']))
     )
-
 
 def uses_fsx(notebook):
     """Check whether the notebook should be skipped because it uses FXS, FSxLustre or EFS.

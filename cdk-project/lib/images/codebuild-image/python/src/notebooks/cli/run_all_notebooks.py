@@ -14,27 +14,6 @@ def parse_args(args):
     parser = argparse.ArgumentParser(os.path.basename(__file__))
     parser.set_defaults(func=lambda x: parser.print_usage())
     parser.add_argument("--instance", help="Instance type", type=str, required=False)
-    parser.add_argument(
-        "--skip-docker",
-        default=True,
-        help="Skip notebooks that use Docker",
-        type=bool,
-        required=False,
-    )
-    parser.add_argument(
-        "--skip-localmode",
-        default=True,
-        help="Skip notebooks that use Local Mode",
-        type=bool,
-        required=False,
-    )
-    parser.add_argument(
-        "--skip-filesystem",
-        default=True,
-        help="Skip notebooks that use FSx and EFS file systems",
-        type=bool,
-        required=False,
-    )
 
     parsed = parser.parse_args(args)
 
@@ -72,13 +51,7 @@ def main():
     session = ensure_session()
     instance_type = args.instance or "ml.m5.xlarge"
     for notebook in notebook_names:
-        if args.skip_docker and parse.uses_docker(notebook):
-            job_name = None
-        elif args.skip_localmode and parse.local_mode_mandatory(notebook):
-            job_name = None
-        elif args.skip_filesystem and parse.uses_fsx(notebook):
-            job_name = None
-        elif parse.skip(notebook):
+        if parse.is_notebook_skipped(notebook):
             job_name = None
         else:
             image = kernels.kernel_image_for(notebook)

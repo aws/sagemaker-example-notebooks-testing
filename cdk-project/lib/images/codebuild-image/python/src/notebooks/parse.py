@@ -4,6 +4,7 @@ from pathlib import Path
 from os import walk
 from github import Github
 from notebooks.git import Git
+import re
 
 # List of notebooks and directories skipped by the CI currently
 SKIP_LIST = {
@@ -47,8 +48,10 @@ LOCAL_MODE_OPTIONAL_LIST = [
     "frameworks/tensorflow/get_started_mnist_train.ipynb"
 ]
 
+
 def get_lm_optional_nb_names():
     return LOCAL_MODE_OPTIONAL_LIST
+
 
 def all_notebook_filenames():
     """Return all the notebook filenames in the current directory.
@@ -102,6 +105,7 @@ def get_deleted_files(pr_num):
 
     return filter(is_deleted, [file for file in get_pr_files(pr_num)])
 
+
 def is_deleted(file):
     """Check whether a given file is in a removed or deleted state.
 
@@ -114,11 +118,12 @@ def is_deleted(file):
     """
     return file.status == 'removed'
 
+
 def check_file_references(name):
     """Check whether a given file is referenced in the repo
 
     Args:
-        filename: The filename to check.
+        name: The filename to check.
 
     Returns:
         bool: Whether the given file has been refereenced in the repo or not.
@@ -180,6 +185,7 @@ def all_cells(notebook):
         cells = json.load(notebook_file)["cells"]
     return cells
 
+
 def code_cells(notebook):
     """Get a list of all the code cells in a given notebook.
 
@@ -194,25 +200,26 @@ def code_cells(notebook):
     cells = all_cells(notebook)
     return [cell["source"] for cell in cells if cell["cell_type"] == "code"]
 
-def contains_code(notebook, snippets):
+
+def contains_code(notebook, regex_list):
     """Check whether a notebook contains any of a list of code snippets in any of its code cells.
 
     Args:
         notebook (Path): The notebook to check for code snippets.
-        snippets ([str]): The list of code snippet strings to check for.
+        regex_list ([str]): The list of regexes to check for
 
     Returns:
         bool: Whether any of the code snippets exist in the notebook's code cells.
 
     """
     source = code_cells(notebook)
-
     for cell_source in source:
         for line in cell_source:
-            if any(snippet in line for snippet in snippets):
+            # if the line contains any of the regexes, return True
+            if any(re.search(regex, line, re.IGNORECASE) for regex in regex_list):
                 return True
-
     return False
+
 
 def markdown_cells(notebook):
     """Get a list of all the Markdown cells in a given notebook.
@@ -226,6 +233,7 @@ def markdown_cells(notebook):
     """
     cells = all_cells(notebook)
     return [cell["source"] for cell in cells if cell["cell_type"] == "markdown"]
+
 
 def skip(notebook):
     """Check whether the notebook should be skipped.
@@ -245,6 +253,7 @@ def skip(notebook):
         return True
     return False
 
+
 def uses_docker(notebook):
     """Check whether the notebook should be skipped because it uses docker based functionality.
 
@@ -255,9 +264,9 @@ def uses_docker(notebook):
         bool: True if the notebook uses docker.
 
     """
-    return contains_code(
-        notebook, ["docker ", "docker-compose ", "Docker "]
-    )
+    regex_to_match = ["\s?docker\s?", "\s?docker-compose\s?"]
+    return contains_code(notebook, regex_to_match)
+
 
 def local_mode_mandatory(notebook):
     """Check whether the notebook should be skipped because runs only in Local Mode
@@ -269,10 +278,12 @@ def local_mode_mandatory(notebook):
         bool: True if local mode is mandatory.
 
     """
+    regex_to_match = ['instance_type\s?=\s?"local"']
     return (
-            (str(notebook) not in LOCAL_MODE_OPTIONAL_LIST) and
-            (contains_code(notebook, ['instance_type = "local"', 'instance_type="local"']))
+            (str(notebook) not in get_lm_optional_nb_names()) and
+            (contains_code(notebook, regex_to_match))
     )
+
 
 def uses_fsx(notebook):
     """Check whether the notebook should be skipped because it uses FXS, FSxLustre or EFS.
@@ -285,5 +296,9 @@ def uses_fsx(notebook):
 
     """
     return contains_code(
-        notebook, ['"FSxLustre"', "'FSxLustre'", '"EFS"', "'EFS'"]
+        notebook, ['[FSxLustre]', '[EFS]']
     )
+
+
+def is_notebook_skipped(notebook):
+    return skip(notebook) or uses_fsx(notebook) or uses_docker(notebook) or local_mode_mandatory(notebook)

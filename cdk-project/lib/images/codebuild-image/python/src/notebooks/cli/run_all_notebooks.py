@@ -68,7 +68,6 @@ def main():
             )
             time.sleep(1)
 
-        print(f"Notebook is.....{notebook}")
         print(job_name)
         job_names.append(str(job_name))
         kernel_names.append(kernels.kernel_type_for(notebook))

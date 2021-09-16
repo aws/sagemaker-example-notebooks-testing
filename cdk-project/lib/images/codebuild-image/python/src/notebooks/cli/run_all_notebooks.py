@@ -73,33 +73,30 @@ def main():
     notebook_names = parse.all_notebook_filenames()
     job_names = []
     kernel_names = []
-    skipped_count = 0
     session = ensure_session()
     instance_type = args.instance or "ml.m5.xlarge"
     for notebook in notebook_names:
         if parse.is_notebook_skipped(notebook, skip_args):
             job_name = None
-            skipped_count += 1
         else:
             image = kernels.kernel_image_for(notebook)
             s3path = upload_notebook(notebook, session)
             parameters = {"kms_key": kms_key()}
-            # job_name = execute_notebook(
-            #     image=image,
-            #     input_path=s3path,
-            #     notebook=notebook,
-            #     instance_type=instance_type,
-            #     session=session,
-            #     output_prefix=get_output_prefix(),
-            #     parameters=parameters,
-            # )
-            # time.sleep(1)
+            job_name = execute_notebook(
+                image=image,
+                input_path=s3path,
+                notebook=notebook,
+                instance_type=instance_type,
+                session=session,
+                output_prefix=get_output_prefix(),
+                parameters=parameters,
+            )
+            time.sleep(1)
 
-        # print(job_name)
+        print(job_name)
         job_names.append(str(job_name))
         kernel_names.append(kernels.kernel_type_for(notebook))
 
-    print(f'Skipping......{skipped_count} notebooks')
     print("\n" * 2)
     print("-" * 100)
     print("\n" * 2)

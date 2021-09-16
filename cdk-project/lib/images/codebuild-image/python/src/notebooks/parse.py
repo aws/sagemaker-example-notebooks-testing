@@ -216,15 +216,12 @@ def contains_code(notebook, regex_list):
     source = code_cells(notebook)
     for cell_source in source:
         for line in cell_source:
-            # if the line contains any of the regexes, return True
             # Ignore comments
             if line.startswith('#'):
                 continue
+            # if the line contains any of the regexes, return True
             for regex in regex_list:
                 if re.search(regex, line, re.IGNORECASE):
-                    print("found!")
-                    print(regex)
-                    print(line)
                     return True
     return False
 
@@ -295,9 +292,6 @@ def uses_unsupported_feature_or_framework(notebook,skip_args):
 
     for identifier in functionalities_to_check:
         if skip_args.get(identifier, True) and contains_code(notebook, functionalities_to_check[identifier]):
-            print(notebook)
-            print(identifier)
-            print("framework issue")
             return True
 
     return False
@@ -313,23 +307,10 @@ def is_notebook_skipped(notebook, skip_args):
         bool: True if the notebook skip conditions are met, False otherwise
 
     """
-    return is_skip_reason_other(notebook) or uses_unsupported_feature_or_framework(notebook, skip_args) or local_mode_mandatory(notebook)
-    # return local_mode_mandatory(notebook)
+    # These notebooks run end-to-end, even though they use docker so we will explicitly not skip them
+    if str(notebook) in get_lm_optional_nb_names():
+        return False
 
+    # Otherwise, check for presence of docker, local mode, efs, fsx or other reasons to skip
+    return is_skip_reason_other(notebook) or uses_unsupported_feature_or_framework(notebook, skip_args)
 
-# def run_all():
-#     skip_args = {
-#         "docker": True,
-#         "local_mode": True,
-#         "fsx_esx": True
-#     }
-#     count = 0
-#     for notebook in all_notebook_filenames():
-#         print(notebook)
-#         if is_notebook_skipped(notebook, skip_args):
-#             count += 1
-#         # else:
-#         #     print('not incrementing')
-#     print(count)
-
-# run_all()

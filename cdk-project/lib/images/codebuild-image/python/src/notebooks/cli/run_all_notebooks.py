@@ -14,7 +14,28 @@ def parse_args(args):
     parser = argparse.ArgumentParser(os.path.basename(__file__))
     parser.set_defaults(func=lambda x: parser.print_usage())
     parser.add_argument("--instance", help="Instance type", type=str, required=False)
+    parser.add_argument(
+        "--skip-docker",
+        default=True,
+        help="Skip notebooks that use Docker",
+        type=bool,
+        required=False,
+    )
+    parser.add_argument(
+        "--skip-filesystem",
+        default=True,
+        help="Skip notebooks that use FSx and EFS file systems",
+        type=bool,
+        required=False,
+    )
 
+    parser.add_argument(
+        "--skip-local",
+        default=True,
+        help="Skip notebooks that use Local Mode",
+        type=bool,
+        required=False,
+    )
     parsed = parser.parse_args(args)
 
     return parsed
@@ -43,35 +64,42 @@ def save_csv_to_s3(notebooks, job_names, kernels):
 
 def main():
     args = parse_args(sys.argv[1:])
+    skip_args = {
+        "docker": args.skip_docker,
+        "local_mode": args.skip_local,
+        "fsx_esx": args.skip_filesystem
+    }
 
     notebook_names = parse.all_notebook_filenames()
     job_names = []
     kernel_names = []
-
+    skipped_count = 0
     session = ensure_session()
     instance_type = args.instance or "ml.m5.xlarge"
     for notebook in notebook_names:
-        if parse.is_notebook_skipped(notebook):
+        if parse.is_notebook_skipped(notebook, skip_args):
             job_name = None
+            skipped_count += 1
         else:
             image = kernels.kernel_image_for(notebook)
             s3path = upload_notebook(notebook, session)
             parameters = {"kms_key": kms_key()}
-            job_name = execute_notebook(
-                image=image,
-                input_path=s3path,
-                notebook=notebook,
-                instance_type=instance_type,
-                session=session,
-                output_prefix=get_output_prefix(),
-                parameters=parameters,
-            )
-            time.sleep(1)
+            # job_name = execute_notebook(
+            #     image=image,
+            #     input_path=s3path,
+            #     notebook=notebook,
+            #     instance_type=instance_type,
+            #     session=session,
+            #     output_prefix=get_output_prefix(),
+            #     parameters=parameters,
+            # )
+            # time.sleep(1)
 
-        print(job_name)
+        # print(job_name)
         job_names.append(str(job_name))
         kernel_names.append(kernels.kernel_type_for(notebook))
 
+    print(f'Skipping......{skipped_count} notebooks')
     print("\n" * 2)
     print("-" * 100)
     print("\n" * 2)

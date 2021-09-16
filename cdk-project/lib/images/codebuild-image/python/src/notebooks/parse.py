@@ -144,6 +144,7 @@ def check_file_references(name):
                         references.append(file_name)
     return references
 
+
 def is_notebook(filename):
     """Check whether a given file is a Jupyter notebook.
 
@@ -216,8 +217,15 @@ def contains_code(notebook, regex_list):
     for cell_source in source:
         for line in cell_source:
             # if the line contains any of the regexes, return True
-            if any(re.search(regex, line, re.IGNORECASE) for regex in regex_list):
-                return True
+            # Ignore comments
+            if line.startswith('#'):
+                continue
+            for regex in regex_list:
+                if re.search(regex, line, re.IGNORECASE):
+                    print("found!")
+                    print(regex)
+                    print(line)
+                    return True
     return False
 
 
@@ -235,14 +243,15 @@ def markdown_cells(notebook):
     return [cell["source"] for cell in cells if cell["cell_type"] == "markdown"]
 
 
-def skip(notebook):
-    """Check whether the notebook should be skipped.
+def is_skip_reason_other(notebook):
+    """Check whether the notebook should be skipped, because it uses features like AWS Marketplace
+    crowd sourcing or others
 
     Args:
         notebook (Path): The notebook to check whether to skip.
 
     Returns:
-        bool: True if the notebook should be skipped.
+        bool: True if the notebook should be skipped because of above mentioned reasons
 
     """
     directories = Path(notebook).parents
@@ -252,20 +261,6 @@ def skip(notebook):
     elif any([str(directory) in SKIP_LIST for directory in directories]):
         return True
     return False
-
-
-def uses_docker(notebook):
-    """Check whether the notebook should be skipped because it uses docker based functionality.
-
-    Args:
-        notebook (Path): The notebook to check.
-
-    Returns:
-        bool: True if the notebook uses docker.
-
-    """
-    regex_to_match = ["\s?docker\s?", "\s?docker-compose\s?"]
-    return contains_code(notebook, regex_to_match)
 
 
 def local_mode_mandatory(notebook):
@@ -278,27 +273,63 @@ def local_mode_mandatory(notebook):
         bool: True if local mode is mandatory.
 
     """
-    regex_to_match = ['instance_type\s?=\s?"local"']
-    return (
-            (str(notebook) not in get_lm_optional_nb_names()) and
-            (contains_code(notebook, regex_to_match))
-    )
+    directories = Path(notebook).parents
+    return "reinforcement_learning" in directories and str(notebook) not in get_lm_optional_nb_names()
 
 
-def uses_fsx(notebook):
-    """Check whether the notebook should be skipped because it uses FXS, FSxLustre or EFS.
+def uses_unsupported_feature_or_framework(notebook,skip_args):
+    """Check whether the notebook should be skipped because it uses FXS, Docker or Local Mode.
 
     Args:
         notebook (Path): The notebook to check.
-
+        skip_args (dict): A dictionary containing feature flag for each kind of skip, user-driven with sensible defaults
     Returns:
-        bool: True if the notebook uses FSX, FSxLustre or EFS.
+        bool: True if the notebook uses FXS, Docker or Local Mode.
 
     """
-    return contains_code(
-        notebook, ['[FSxLustre]', '[EFS]']
-    )
+    functionalities_to_check = {
+        "docker": ["docker\s+", "docker-compose\s+"],
+        "local_mode": ['instance_type\s?=\s?"local"'],
+        "fsx_efs": ['\s?FSxLustre\s?', '\s?EFS\s?']
+    }
+
+    for identifier in functionalities_to_check:
+        if skip_args.get(identifier, True) and contains_code(notebook, functionalities_to_check[identifier]):
+            print(notebook)
+            print(identifier)
+            print("framework issue")
+            return True
+
+    return False
 
 
-def is_notebook_skipped(notebook):
-    return skip(notebook) or uses_fsx(notebook) or uses_docker(notebook) or local_mode_mandatory(notebook)
+def is_notebook_skipped(notebook, skip_args):
+    """Top level method to whether the notebook should be skipped based on certain conditions, as described by the methods above
+
+    Args:
+        notebook (Path): The notebook to check.
+        skip_args (dict): A dictionary containing feature flag for enabling each kind of skip, user-driven with sensible defaults
+    Returns:
+        bool: True if the notebook skip conditions are met, False otherwise
+
+    """
+    return is_skip_reason_other(notebook) or uses_unsupported_feature_or_framework(notebook, skip_args) or local_mode_mandatory(notebook)
+    # return local_mode_mandatory(notebook)
+
+
+# def run_all():
+#     skip_args = {
+#         "docker": True,
+#         "local_mode": True,
+#         "fsx_esx": True
+#     }
+#     count = 0
+#     for notebook in all_notebook_filenames():
+#         print(notebook)
+#         if is_notebook_skipped(notebook, skip_args):
+#             count += 1
+#         # else:
+#         #     print('not incrementing')
+#     print(count)
+
+# run_all()

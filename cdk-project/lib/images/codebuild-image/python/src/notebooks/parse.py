@@ -307,7 +307,8 @@ def is_notebook_skipped(notebook, skip_args):
         bool: True if the notebook skip conditions are met, False otherwise
 
     """
-    # These notebooks run end-to-end, even though they use docker so we will explicitly not skip them
+    # These notebooks run end-to-end because they use Local Mode optionally.
+    # They execute even in the presence of docker commands, so we will explicitly not skip them
     if str(notebook) in get_lm_optional_nb_names():
         return False
 

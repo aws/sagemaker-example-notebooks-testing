@@ -20,7 +20,6 @@ def parse_args(args):
     parser.set_defaults(func=lambda x: parser.print_usage())
     parser.add_argument("--pr", help="Pull request number", type=int, required=True)
     parser.add_argument("--instance", help="Instance type", type=str, required=False)
-    parser.set_defaults(func=lambda x: parser.print_usage())
     parser.add_argument(
         "--skip-docker",
         default=True,

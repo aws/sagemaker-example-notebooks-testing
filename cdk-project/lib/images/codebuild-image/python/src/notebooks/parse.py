@@ -18,6 +18,7 @@ SKIP_LIST = {
     "async-inference",
     "patterns/ml_gateway/ml-gateway.ipynb",
     "reinforcement_learning/bandits_statlog_vw_customEnv/bandits_statlog_vw_customEnv.ipynb",
+    "sagemaker-featurestore/feature_store_kms_key_encryption.ipynb",
     "sagemaker-fundamentals",
     "sagemaker-pipelines/tabular/lambda-step/sagemaker-pipelines-lambda-step.ipynb",
     "sagemaker-pipelines/tabular/tensorflow2-california-housing-sagemaker-pipelines-deploy-endpoint/tensorflow2-california-housing-sagemaker-pipelines-deploy-endpoint.ipynb",

@@ -286,7 +286,7 @@ def uses_unsupported_feature_or_framework(notebook, skip_args):
     }
 
     for identifier in functionalities_to_check:
-        if skip_args.get(identifier, True) and contains_code(notebook, functionalities_to_check[identifier]):
+        if skip_args.get(identifier, True) and contains_code(notebook, functionalities_to_check.get(identifier)):
             return True
 
     return False

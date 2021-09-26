@@ -6,7 +6,7 @@ from github import Github
 from notebooks.git import Git
 import re
 
-# List of notebooks and directories skipped by the CI currently
+# List of notebooks and directories skipped by the CI currently.
 SKIP_LIST = {
     "advanced_functionality/distributed_tensorflow_mask_rcnn",
     "advanced_functionality/multi_model_linear_learner_home_value/linear_learner_multi_model_endpoint_inf_pipeline.ipynb",
@@ -31,7 +31,7 @@ SKIP_LIST = {
 }
 
 # Not all notebooks can run on local_mode as well as SageMaker mode.
-# This is a list of some notebooks that use Local Mode, but optionally, and can be run on the CI in "SageMaker Mode"
+# This is a list of some notebooks that use Local Mode, but optionally, and can be run on the CI in "SageMaker Mode".
 # Such notebooks have local_mode usage set to False by default.
 LOCAL_MODE_OPTIONAL_LIST = [
     "reinforcement_learning/rl_mountain_car_coach_gymEnv/rl_mountain_car_coach_gymEnv.ipynb",
@@ -120,13 +120,13 @@ def is_deleted(file):
 
 
 def check_file_references(name):
-    """Check whether a given file is referenced in the repo
+    """Check whether a given file is referenced in the repo.
 
     Args:
         name: The filename to check.
 
     Returns:
-        bool: Whether the given file has been refereenced in the repo or not.
+        bool: Whether the given file has been referenced in the repo or not.
 
     """
     references = []
@@ -207,7 +207,7 @@ def contains_code(notebook, regex_list):
 
     Args:
         notebook (Path): The notebook to check for code snippets.
-        regex_list ([str]): The list of regexes to check for
+        regex_list ([str]): The list of regexes to check for.
 
     Returns:
         bool: Whether any of the code snippets exist in the notebook's code cells.
@@ -242,13 +242,13 @@ def markdown_cells(notebook):
 
 def is_skip_reason_other(notebook):
     """Check whether the notebook should be skipped, because it uses features like AWS Marketplace
-    crowd sourcing or others
+    crowd sourcing or others.
 
     Args:
         notebook (Path): The notebook to check whether to skip.
 
     Returns:
-        bool: True if the notebook should be skipped because of above mentioned reasons
+        bool: True if the notebook should be skipped because of above mentioned reasons.
 
     """
     directories = Path(notebook).parents
@@ -261,7 +261,7 @@ def is_skip_reason_other(notebook):
 
 
 def local_mode_mandatory(notebook):
-    """Check whether the notebook should be skipped because runs only in Local Mode
+    """Check whether the notebook should be skipped because runs only in Local Mode.
 
     Args:
         notebook (Path): The notebook to check.
@@ -271,23 +271,25 @@ def local_mode_mandatory(notebook):
 
     """
     directories = Path(notebook).parents
-    return "reinforcement_learning" in directories and str(notebook) not in get_lm_optional_nb_names()
+    dirs_to_check = ["frameworks", "reinforcement_learning"]
+    return any([directory in directories for directory in dirs_to_check]) and str(
+        notebook) not in get_lm_optional_nb_names()
 
 
-def uses_unsupported_feature_or_framework(notebook,skip_args):
+def uses_unsupported_feature_or_framework(notebook, skip_args):
     """Check whether the notebook should be skipped because it uses FXS, Docker or Local Mode.
 
     Args:
         notebook (Path): The notebook to check.
-        skip_args (dict): A dictionary containing feature flag for each kind of skip, user-driven with sensible defaults
+        skip_args (dict): A dictionary containing feature flag for each kind of skip, user-driven with sensible defaults.
     Returns:
         bool: True if the notebook uses FXS, Docker or Local Mode.
 
     """
     functionalities_to_check = {
         "docker": ["docker\s+", "docker-compose\s+"],
-        "local_mode": ['instance_type\s?=\s?"local"'],
-        "fsx_efs": ['\s?FSxLustre\s?', '\s?EFS\s?']
+        "local_mode": ['instance_type\s*=\s*"local"'],
+        "fsx_efs": ["\s+(efs|EFS)\s+", "^(EFS|efs)\s+"]
     }
 
     for identifier in functionalities_to_check:
@@ -298,13 +300,13 @@ def uses_unsupported_feature_or_framework(notebook,skip_args):
 
 
 def is_notebook_skipped(notebook, skip_args):
-    """Top level method to whether the notebook should be skipped based on certain conditions, as described by the methods above
+    """Top level method to whether the notebook should be skipped based on certain conditions, as described by the methods above.
 
     Args:
         notebook (Path): The notebook to check.
-        skip_args (dict): A dictionary containing feature flag for enabling each kind of skip, user-driven with sensible defaults
+        skip_args (dict): A dictionary containing feature flag for enabling each kind of skip, user-driven with sensible defaults.
     Returns:
-        bool: True if the notebook skip conditions are met, False otherwise
+        bool: True if the notebook skip conditions are met, False otherwise.
 
     """
     # These notebooks run end-to-end because they use Local Mode optionally.
@@ -314,4 +316,3 @@ def is_notebook_skipped(notebook, skip_args):
 
     # Otherwise, check for presence of docker, local mode, efs, fsx or other reasons to skip
     return is_skip_reason_other(notebook) or uses_unsupported_feature_or_framework(notebook, skip_args)
-

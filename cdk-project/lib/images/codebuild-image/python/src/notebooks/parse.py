@@ -269,22 +269,6 @@ def is_skip_reason_other(notebook):
     return False
 
 
-def local_mode_mandatory(notebook):
-    """Check whether the notebook should be skipped because runs only in Local Mode.
-
-    Args:
-        notebook (Path): The notebook to check.
-
-    Returns:
-        bool: True if local mode is mandatory.
-
-    """
-    directories = Path(notebook).parents
-    dirs_to_check = ["frameworks", "reinforcement_learning"]
-    return any([directory in directories for directory in dirs_to_check]) and str(
-        notebook) not in get_lm_optional_nb_names()
-
-
 def uses_unsupported_feature_or_framework(notebook, skip_args):
     """Check whether the notebook should be skipped because it uses FXS, Docker or Local Mode.
 

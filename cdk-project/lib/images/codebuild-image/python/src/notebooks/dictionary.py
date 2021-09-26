@@ -458,7 +458,9 @@ allow_list = {
     "featurized",
     "Chainer",
     "dataframe",
-    "logit"
+    "logit",
+    "scaler",
+    "StatLib"
 }
 
 rules_to_ignore = {

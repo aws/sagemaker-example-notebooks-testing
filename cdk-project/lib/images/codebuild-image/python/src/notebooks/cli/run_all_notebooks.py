@@ -29,6 +29,13 @@ def parse_args(args):
         required=False,
     )
 
+    parser.add_argument(
+        "--skip-local",
+        default=True,
+        help="Skip notebooks that use Local Mode",
+        type=bool,
+        required=False,
+    )
     parsed = parser.parse_args(args)
 
     return parsed
@@ -57,23 +64,19 @@ def save_csv_to_s3(notebooks, job_names, kernels):
 
 def main():
     args = parse_args(sys.argv[1:])
+    skip_args = {
+        "docker": args.skip_docker,
+        "local_mode": args.skip_local,
+        "fsx_esx": args.skip_filesystem
+    }
 
     notebook_names = parse.all_notebook_filenames()
     job_names = []
     kernel_names = []
-
     session = ensure_session()
     instance_type = args.instance or "ml.m5.xlarge"
     for notebook in notebook_names:
-        if args.skip_docker and parse.contains_code(
-            notebook, ["docker ", 'instance_type = "local"', 'instance_type="local"', "docker-compose ", "Docker "]
-        ):
-            job_name = None
-        elif args.skip_filesystem and parse.contains_code(
-            notebook, ['"FSxLustre"', "'FSxLustre'", '"EFS"', "'EFS'"]
-        ):
-            job_name = None
-        elif parse.skip(notebook):
+        if parse.is_notebook_skipped(notebook, skip_args):
             job_name = None
         else:
             image = kernels.kernel_image_for(notebook)

@@ -35,6 +35,13 @@ def parse_args(args):
         required=False,
     )
 
+    parser.add_argument(
+        "--skip-local",
+        default=True,
+        help="Skip notebooks that use Local Mode",
+        type=bool,
+        required=False,
+    )
     parsed = parser.parse_args(args)
     if not parsed.pr:
         parser.error("--pr required")
@@ -44,17 +51,16 @@ def parse_args(args):
 
 def main():
     args = parse_args(sys.argv[1:])
-
+    skip_args = {
+        "docker": args.skip_docker,
+        "local_mode": args.skip_local,
+        "fsx_esx": args.skip_filesystem
+    }
     jobs = {}
-
     session = ensure_session()
     instance_type = args.instance or "ml.m5.xlarge"
     for notebook in parse.pr_notebook_filenames(args.pr):
-        if args.skip_docker and parse.contains_code(
-            notebook, ["docker ", 'instance_type = "local"', 'instance_type="local"', "docker-compose ", "Docker "]
-        ):
-            job_name = None
-        elif parse.skip(notebook):
+        if parse.is_notebook_skipped(notebook, skip_args):
             job_name = None
         else:
             image = kernels.kernel_image_for(notebook)

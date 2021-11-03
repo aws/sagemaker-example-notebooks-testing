@@ -23,6 +23,7 @@ SKIP_LIST = {
     "async-inference",
     "patterns/ml_gateway/ml-gateway.ipynb",
     "reinforcement_learning/bandits_statlog_vw_customEnv/bandits_statlog_vw_customEnv.ipynb",
+    "reinforcement_learning/rl_game_server_autopilot/sagemaker/rl_gamerserver_ray.ipynb",
     "reinforcement_learning/rl_roboschool_ray/rl_roboschool_ray_automatic_model_tuning.ipynb",
     "sagemaker-featurestore/feature_store_client_side_encryption.ipynb",
     "sagemaker-featurestore/feature_store_kms_key_encryption.ipynb",
